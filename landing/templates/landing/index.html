@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Uma plataforma com IA que analisa tendências, concorrência, saturação e oportunidades para ajudar vendedores a tomar decisões melhores.">
-    <meta name="keywords" content="análise de produtos, tendências de mercado, shopee, mercado livre, dropshipping">
-    <title>Radar de Tendências - Descubra produtos com potencial antes de comprar estoque</title>
+    <meta name="description" content="IA que detecta oportunidades de produtos antes da saturação. Análise de tendências, concorrência e sinais de mercado em tempo real.">
+    <meta name="keywords" content="análise de produtos, tendências de mercado, inteligência artificial, shopee, mercado livre, dropshipping">
+    <title>Radar de Tendências - Detecte oportunidades antes da concorrência</title>
 
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -22,7 +22,10 @@
     <!-- Header with Logo -->
     <header class="landing-header">
         <div class="container">
-            <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="landing-logo">
+            <div class="header-content">
+                <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="landing-logo">
+                <span class="beta-badge">Beta</span>
+            </div>
         </div>
     </header>
 
@@ -31,8 +34,27 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 hero-content">
-                    <h1 class="hero-title">Descubra produtos com potencial antes de comprar estoque</h1>
-                    <p class="hero-subtitle">Uma plataforma com IA que analisa tendências, concorrência, saturação e oportunidades para ajudar vendedores a tomar decisões melhores.</p>
+                    <div class="hero-badge">
+                        <i class="bi bi-lightning-charge"></i>
+                        Inteligência de Mercado com IA
+                    </div>
+                    <h1 class="hero-title">Encontre produtos com potencial antes da saturação</h1>
+                    <p class="hero-subtitle">A IA detecta sinais de tendência, analisa concorrência e identifica oportunidades usando dados reais de marketplaces. Pare de comprar estoque no achismo.</p>
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">
+                                <i class="bi bi-graph-up"></i>
+                                <span class="pulse-dot"></span>
+                            </div>
+                            <span class="stat-label">Análise em tempo real</span>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">
+                                <i class="bi bi-shield-check"></i>
+                            </div>
+                            <span class="stat-label">Dados reais do mercado</span>
+                        </div>
+                    </div>
                     <a href="#form" class="btn btn-primary btn-lg cta-button smooth-scroll">
                         Quero acesso antecipado
                         <i class="bi bi-arrow-right ms-2"></i>
@@ -41,14 +63,31 @@
                 <div class="col-lg-6">
                     <div class="mockup-card">
                         <div class="mockup-header">
-                            <span class="mockup-label">Análise de Produto</span>
+                            <span class="mockup-label">
+                                <span class="scanning-indicator"></span>
+                                Análise de Produto
+                            </span>
+                            <span class="live-badge">
+                                <span class="live-dot"></span>
+                                Ao vivo
+                            </span>
                         </div>
                         <div class="mockup-body">
-                            <h3 class="product-name">Mini Impressora Térmica</h3>
+                            <h3 class="product-name">Luminária LED Sunset Projetor</h3>
+
+                            <!-- AI Analysis Text -->
+                            <div class="ai-analysis">
+                                <i class="bi bi-stars"></i>
+                                <p class="analysis-text">Com base nos dados coletados online, este produto apresenta aumento consistente de buscas (+47% em 30 dias), baixa saturação em marketplaces brasileiros e margem de lucro competitiva.</p>
+                            </div>
+
                             <div class="metrics-grid">
                                 <div class="metric-item">
                                     <span class="metric-label">Tendência</span>
-                                    <span class="metric-value high">Alta</span>
+                                    <span class="metric-value high">
+                                        <span class="trend-arrow">↗</span>
+                                        Alta
+                                    </span>
                                 </div>
                                 <div class="metric-item">
                                     <span class="metric-label">Concorrência</span>
@@ -56,17 +95,32 @@
                                 </div>
                                 <div class="metric-item">
                                     <span class="metric-label">Saturação</span>
-                                    <span class="metric-value low">Baixa</span>
+                                    <span class="metric-value low">
+                                        <span class="check-icon">✓</span>
+                                        Baixa
+                                    </span>
                                 </div>
                                 <div class="metric-item">
                                     <span class="metric-label">Faixa ideal</span>
-                                    <span class="metric-value">R$79 – R$129</span>
+                                    <span class="metric-value">R$45 – R$89</span>
                                 </div>
                             </div>
                             <div class="score-section">
                                 <div class="score-circle">
-                                    <span class="score-number">8.7</span>
-                                    <span class="score-max">/10</span>
+                                    <svg class="score-ring" width="90" height="90">
+                                        <defs>
+                                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle class="score-ring-bg" cx="45" cy="45" r="38"></circle>
+                                        <circle class="score-ring-progress" cx="45" cy="45" r="38"></circle>
+                                    </svg>
+                                    <div class="score-content">
+                                        <span class="score-number">8.4</span>
+                                        <span class="score-max">/10</span>
+                                    </div>
                                 </div>
                                 <div class="score-info">
                                     <p class="score-title">Score de oportunidade</p>
@@ -83,146 +137,134 @@
         </div>
     </section>
 
-    <!-- Pain Section -->
-    <section id="pain" class="pain-section">
+    <!-- How It Works Section -->
+    <section id="how-it-works" class="how-it-works-section">
         <div class="container">
             <div class="section-header text-center">
-                <h2 class="section-title">Comprar produto no achismo custa caro</h2>
-                <p class="section-description">
-                    Muitos vendedores gastam horas pesquisando produtos, analisando concorrentes manualmente e tentando descobrir se um item realmente tem demanda. O problema é que, quando percebem, o mercado já está saturado ou a margem não compensa.
-                </p>
+                <h2 class="section-title">Como funciona</h2>
+                <p class="section-description">Inteligência de mercado automatizada em 3 passos</p>
             </div>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="pain-card">
-                        <i class="bi bi-search pain-icon"></i>
-                        <h3 class="pain-title">Dificuldade para encontrar produtos com potencial</h3>
+            <div class="row g-5">
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">01</div>
+                        <div class="step-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h3 class="step-title">Digite um nicho ou produto</h3>
+                        <p class="step-description">Informe o tipo de produto que você quer analisar. A IA entende contexto e categorias.</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pain-card">
-                        <i class="bi bi-exclamation-triangle pain-icon"></i>
-                        <h3 class="pain-title">Medo de comprar estoque errado</h3>
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">02</div>
+                        <div class="step-icon">
+                            <i class="bi bi-cpu"></i>
+                            <span class="processing-indicator"></span>
+                        </div>
+                        <h3 class="step-title">A IA analisa tendências e concorrência</h3>
+                        <p class="step-description">Algoritmos processam dados de marketplaces, redes sociais e buscadores em tempo real.</p>
                     </div>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pain-card">
-                        <i class="bi bi-people pain-icon"></i>
-                        <h3 class="pain-title">Concorrência alta</h3>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pain-card">
-                        <i class="bi bi-clock pain-icon"></i>
-                        <h3 class="pain-title">Pesquisa manual demorada</h3>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="pain-card">
-                        <i class="bi bi-graph-down pain-icon"></i>
-                        <h3 class="pain-title">Falta de dados claros para decidir</h3>
+                <div class="col-lg-4">
+                    <div class="step-card">
+                        <div class="step-number">03</div>
+                        <div class="step-icon">
+                            <i class="bi bi-graph-up-arrow"></i>
+                        </div>
+                        <h3 class="step-title">Receba sinais de oportunidade</h3>
+                        <p class="step-description">Veja score, tendência, saturação e faixa de preço ideal antes da maioria dos vendedores.</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
+    <!-- Problem Section -->
+    <section id="problem" class="problem-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="section-title">Decisões baseadas em achismo custam caro</h2>
+                    <p class="problem-text">A maioria dos vendedores descobre que um produto está saturado somente depois de comprar estoque, perder tempo e dinheiro.</p>
+                    <p class="problem-text">Sem dados claros, você compete no mesmo produto que milhares de outros vendedores, com margem cada vez menor.</p>
+                    <div class="problem-highlight">
+                        <i class="bi bi-exclamation-circle"></i>
+                        <span>Enquanto você pesquisa manualmente, concorrentes com dados melhores já estão na frente.</span>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="problem-cards">
+                        <div class="problem-card">
+                            <i class="bi bi-hourglass-split"></i>
+                            <div>
+                                <h4>Horas perdidas pesquisando</h4>
+                                <p>Tempo que poderia ser usado para vender</p>
+                            </div>
+                        </div>
+                        <div class="problem-card">
+                            <i class="bi bi-graph-down-arrow"></i>
+                            <div>
+                                <h4>Mercados saturados</h4>
+                                <p>Produtos que já perderam margem e potencial</p>
+                            </div>
+                        </div>
+                        <div class="problem-card">
+                            <i class="bi bi-question-circle"></i>
+                            <div>
+                                <h4>Falta de clareza</h4>
+                                <p>Decisões tomadas sem dados concretos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section - Reduced -->
     <section id="features" class="features-section">
         <div class="container">
             <div class="section-header text-center">
-                <h2 class="section-title">O que a IA analisa</h2>
+                <h2 class="section-title">O que a IA analisa para você</h2>
+                <p class="section-description">Dados processados em tempo real de múltiplas fontes</p>
             </div>
             <div class="row g-4">
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card">
-                        <i class="bi bi-graph-up-arrow feature-icon"></i>
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-graph-up-arrow feature-icon"></i>
+                            <span class="icon-pulse"></span>
+                        </div>
                         <h3 class="feature-title">Tendências de mercado</h3>
-                        <p class="feature-description">Identifica produtos em ascensão antes da saturação</p>
+                        <p class="feature-description">Detecta produtos em crescimento antes da saturação</p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-3">
                     <div class="feature-card">
-                        <i class="bi bi-people-fill feature-icon"></i>
-                        <h3 class="feature-title">Concorrência</h3>
-                        <p class="feature-description">Analisa o nível de competição por produto</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-pie-chart-fill feature-icon"></i>
-                        <h3 class="feature-title">Saturação</h3>
-                        <p class="feature-description">Detecta mercados lotados e oportunidades</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-cash-stack feature-icon"></i>
-                        <h3 class="feature-title">Faixa de preço</h3>
-                        <p class="feature-description">Sugere o range de preço ideal para venda</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-bar-chart-line feature-icon"></i>
-                        <h3 class="feature-title">Sinais de demanda</h3>
-                        <p class="feature-description">Mostra indicadores reais de procura</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-star-fill feature-icon"></i>
-                        <h3 class="feature-title">Score de oportunidade</h3>
-                        <p class="feature-description">Pontuação de potencial de cada produto</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-lightning-fill feature-icon"></i>
-                        <h3 class="feature-title">Produtos emergentes</h3>
-                        <p class="feature-description">Detecta novidades antes da maioria</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="feature-card">
-                        <i class="bi bi-database-fill feature-icon"></i>
-                        <h3 class="feature-title">Dados reais do mercado</h3>
-                        <p class="feature-description">Baseado em informações reais coletadas</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Benefits Section -->
-    <section id="benefits" class="benefits-section">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2 class="section-title">Mais clareza antes de investir em produto</h2>
-            </div>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="benefits-list">
-                        <div class="benefit-item">
-                            <i class="bi bi-check-circle-fill benefit-icon"></i>
-                            <p class="benefit-text">Economize tempo pesquisando produtos</p>
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-people-fill feature-icon"></i>
                         </div>
-                        <div class="benefit-item">
-                            <i class="bi bi-check-circle-fill benefit-icon"></i>
-                            <p class="benefit-text">Reduza o risco de comprar estoque errado</p>
+                        <h3 class="feature-title">Nível de concorrência</h3>
+                        <p class="feature-description">Analisa quantos vendedores competem no mesmo produto</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-pie-chart-fill feature-icon"></i>
                         </div>
-                        <div class="benefit-item">
-                            <i class="bi bi-check-circle-fill benefit-icon"></i>
-                            <p class="benefit-text">Compare oportunidades por nicho</p>
+                        <h3 class="feature-title">Saturação do mercado</h3>
+                        <p class="feature-description">Identifica produtos lotados vs oportunidades abertas</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                    <div class="feature-card">
+                        <div class="feature-icon-wrapper">
+                            <i class="bi bi-cash-stack feature-icon"></i>
                         </div>
-                        <div class="benefit-item">
-                            <i class="bi bi-check-circle-fill benefit-icon"></i>
-                            <p class="benefit-text">Veja sinais de tendência antes da maioria</p>
-                        </div>
-                        <div class="benefit-item">
-                            <i class="bi bi-check-circle-fill benefit-icon"></i>
-                            <p class="benefit-text">Tome decisões baseadas em dados, não em achismo</p>
-                        </div>
+                        <h3 class="feature-title">Faixa de preço ideal</h3>
+                        <p class="feature-description">Sugere o range competitivo baseado em dados</p>
                     </div>
                 </div>
             </div>
@@ -233,11 +275,15 @@
     <section id="form" class="form-section">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-7">
+                <div class="col-lg-6">
                     <div class="form-header text-center">
-                        <h2 class="section-title">Estamos liberando os primeiros acessos</h2>
+                        <div class="form-badge">
+                            <i class="bi bi-lightning-fill"></i>
+                            Acesso Antecipado
+                        </div>
+                        <h2 class="section-title">Entre na lista de espera</h2>
                         <p class="section-description">
-                            O Radar de Tendências está em fase inicial de validação. Os primeiros usuários poderão receber acesso antecipado, condições especiais de lançamento e prioridade nas próximas funcionalidades.
+                            Estamos liberando acesso gradual durante a fase beta. Primeiros usuários terão prioridade e condições especiais.
                         </p>
                     </div>
 
@@ -254,12 +300,11 @@
 
                     <!-- Form Card -->
                     <div class="form-card">
-                        <h3 class="form-title">Entrar na lista de acesso antecipado</h3>
                         <form method="post" novalidate>
                             {% csrf_token %}
 
-                            <div class="mb-3">
-                                <label for="{{ form.name.id_for_label }}" class="form-label">{{ form.name.label }}</label>
+                            <div class="mb-4">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Nome completo</label>
                                 {{ form.name }}
                                 {% if form.name.errors %}
                                     <div class="invalid-feedback d-block">
@@ -268,18 +313,8 @@
                                 {% endif %}
                             </div>
 
-                            <div class="mb-3">
-                                <label for="{{ form.niche.id_for_label }}" class="form-label">{{ form.niche.label }}</label>
-                                {{ form.niche }}
-                                {% if form.niche.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.niche.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="{{ form.whatsapp.id_for_label }}" class="form-label">{{ form.whatsapp.label }}</label>
+                            <div class="mb-4">
+                                <label for="{{ form.whatsapp.id_for_label }}" class="form-label">WhatsApp</label>
                                 {{ form.whatsapp }}
                                 {% if form.whatsapp.errors %}
                                     <div class="invalid-feedback d-block">
@@ -288,41 +323,26 @@
                                 {% endif %}
                             </div>
 
-                            <div class="mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
-                                {{ form.email }}
-                                {% if form.email.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.email.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="{{ form.price_range.id_for_label }}" class="form-label">{{ form.price_range.label }}</label>
-                                {{ form.price_range }}
-                                {% if form.price_range.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.price_range.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
                             <div class="mb-4">
-                                <label for="{{ form.main_difficulty.id_for_label }}" class="form-label">{{ form.main_difficulty.label }}</label>
-                                {{ form.main_difficulty }}
-                                {% if form.main_difficulty.errors %}
+                                <label for="{{ form.niche.id_for_label }}" class="form-label">Nicho ou produto que você vende</label>
+                                {{ form.niche }}
+                                {% if form.niche.errors %}
                                     <div class="invalid-feedback d-block">
-                                        {{ form.main_difficulty.errors }}
+                                        {{ form.niche.errors }}
                                     </div>
                                 {% endif %}
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-lg w-100 submit-button">
-                                Garantir meu acesso antecipado
+                                <span class="button-text">Garantir acesso antecipado</span>
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </button>
                         </form>
+
+                        <p class="form-footer-text">
+                            <i class="bi bi-lock-fill"></i>
+                            Seus dados estão protegidos e não serão compartilhados
+                        </p>
                     </div>
                 </div>
             </div>
@@ -341,12 +361,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    Isso já está pronto?
+                                    A plataforma já está funcionando?
                                 </button>
                             </h3>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Estamos liberando os primeiros acessos antecipados para validar o interesse e construir com base nas necessidades reais dos usuários.
+                                    Estamos em fase beta, liberando acesso gradual para validar e aprimorar a IA com base em feedback real de vendedores.
                                 </div>
                             </div>
                         </div>
@@ -354,12 +374,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    A IA garante que um produto vai vender?
+                                    A IA garante que vou vender?
                                 </button>
                             </h3>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Não. A proposta é reduzir risco e ajudar na tomada de decisão com dados, sinais de tendência e análise de concorrência.
+                                    Não. A proposta é reduzir risco de decisões ruins usando dados e sinais de mercado. Vendas dependem de múltiplos fatores além da escolha do produto.
                                 </div>
                             </div>
                         </div>
@@ -367,12 +387,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Funciona para Shopee e Mercado Livre?
+                                    Funciona para Shopee, Mercado Livre e Instagram?
                                 </button>
                             </h3>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    A proposta é atender vendedores de marketplaces, redes sociais, lojas físicas e outros canais de venda.
+                                    Sim. A IA analisa dados de múltiplos marketplaces e plataformas para identificar tendências de mercado independente do canal de venda.
                                 </div>
                             </div>
                         </div>
@@ -380,12 +400,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    Preciso entender de tecnologia ou IA?
+                                    Preciso entender de IA ou tecnologia?
                                 </button>
                             </h3>
                             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Não. A ideia é que a plataforma entregue análises simples, claras e fáceis de entender.
+                                    Não. A plataforma foi projetada para entregar análises claras e acionáveis, sem necessidade de conhecimento técnico.
                                 </div>
                             </div>
                         </div>
@@ -397,9 +417,14 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container text-center">
-            <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="footer-logo-img">
-            <p class="footer-text">&copy; 2026 Radar de Tendências. Todos os direitos reservados.</p>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="footer-logo-img">
+                    <p class="footer-tagline">Inteligência de mercado com IA</p>
+                </div>
+                <p class="footer-text">&copy; 2026 Radar de Tendências. Todos os direitos reservados.</p>
+            </div>
         </div>
     </footer>
 

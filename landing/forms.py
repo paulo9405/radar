@@ -3,48 +3,30 @@ from .models import Lead
 
 
 class LeadForm(forms.ModelForm):
-    """Form for early access leads with Brazilian Portuguese labels"""
+    """Simplified form for early access leads - only 3 fields for maximum conversion"""
 
     class Meta:
         model = Lead
-        fields = ['name', 'niche', 'whatsapp', 'email', 'price_range', 'main_difficulty']
+        fields = ['name', 'whatsapp', 'niche']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Seu nome completo',
-                'required': True
-            }),
-            'niche': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Ex: Eletrônicos, Moda, Decoração',
+                'placeholder': 'Digite seu nome',
                 'required': True
             }),
             'whatsapp': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': '(34) 99999-9999',
+                'placeholder': '(11) 99999-9999',
                 'required': True
             }),
-            'email': forms.EmailInput(attrs={
+            'niche': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'seu@email.com',
+                'placeholder': 'Ex: Eletrônicos, Moda, Decoração, Fitness',
                 'required': True
-            }),
-            'price_range': forms.Select(attrs={
-                'class': 'form-select',
-                'required': True
-            }),
-            'main_difficulty': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Descreva sua maior dificuldade ao escolher produtos (opcional)',
-                'rows': 4,
-                'required': False
             }),
         }
         labels = {
-            'name': 'Nome',
-            'niche': 'Nicho/Produto que vende ou pretende vender',
+            'name': 'Nome completo',
             'whatsapp': 'WhatsApp',
-            'email': 'Email',
-            'price_range': 'Quanto você pagaria por uma ferramenta assim?',
-            'main_difficulty': 'Qual sua maior dificuldade hoje para encontrar produtos com potencial de venda? (opcional)',
+            'niche': 'Nicho ou produto que você vende',
         }

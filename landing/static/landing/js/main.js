@@ -1,9 +1,11 @@
-// Radar de Tendências - Main JavaScript
-// Smooth scroll and interactions
+// Radar de Tendências - Enhanced JavaScript
+// Premium interactions and AI intelligence indicators
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Smooth scroll for CTA buttons
+    // ==========================
+    // SMOOTH SCROLL
+    // ==========================
     const smoothScrollLinks = document.querySelectorAll('.smooth-scroll');
 
     smoothScrollLinks.forEach(link => {
@@ -21,10 +23,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Intersection Observer for fade-in animations
+    // ==========================
+    // INTERSECTION OBSERVER - Fade in sections
+    // ==========================
     const observerOptions = {
         threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
+        rootMargin: '0px 0px -80px 0px'
     };
 
     const observer = new IntersectionObserver(function(entries) {
@@ -32,44 +36,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (entry.isIntersecting) {
                 entry.target.style.opacity = '1';
                 entry.target.style.transform = 'translateY(0)';
+                entry.target.classList.add('animated');
             }
         });
     }, observerOptions);
 
     // Observe sections for animation
-    const sections = document.querySelectorAll('.pain-section, .features-section, .benefits-section, .form-section, .faq-section');
+    const sections = document.querySelectorAll('.how-it-works-section, .problem-section, .features-section, .form-section, .faq-section');
     sections.forEach(section => {
         section.style.opacity = '0';
-        section.style.transform = 'translateY(30px)';
-        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        section.style.transform = 'translateY(40px)';
+        section.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
         observer.observe(section);
     });
 
-    // Form validation enhancement
-    const form = document.querySelector('form');
-
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            const submitButton = form.querySelector('.submit-button');
-
-            // Add loading state to button
-            if (submitButton) {
-                submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Enviando...';
-                submitButton.disabled = true;
-            }
-        });
-    }
-
-    // Auto-dismiss alerts after 5 seconds
-    const alerts = document.querySelectorAll('.alert');
-    alerts.forEach(alert => {
-        setTimeout(() => {
-            const bsAlert = new bootstrap.Alert(alert);
-            bsAlert.close();
-        }, 5000);
-    });
-
-    // WhatsApp input formatting
+    // ==========================
+    // WHATSAPP INPUT FORMATTING
+    // ==========================
     const whatsappInput = document.querySelector('input[name="whatsapp"]');
 
     if (whatsappInput) {
@@ -90,4 +73,254 @@ document.addEventListener('DOMContentLoaded', function() {
             e.target.value = value;
         });
     }
+
+    // ==========================
+    // FORM SUBMISSION - Loading state
+    // ==========================
+    const form = document.querySelector('form');
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const submitButton = form.querySelector('.submit-button');
+
+            // Add loading state to button
+            if (submitButton) {
+                const buttonText = submitButton.querySelector('.button-text');
+                if (buttonText) {
+                    buttonText.textContent = 'Enviando...';
+                }
+                submitButton.disabled = true;
+                submitButton.style.opacity = '0.7';
+
+                // Add spinner
+                const spinner = document.createElement('div');
+                spinner.className = 'spinner-border spinner-border-sm me-2';
+                spinner.setAttribute('role', 'status');
+                submitButton.prepend(spinner);
+            }
+        });
+    }
+
+    // ==========================
+    // AUTO-DISMISS ALERTS
+    // ==========================
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        }, 6000);
+    });
+
+    // ==========================
+    // MOCKUP CARD ANIMATIONS
+    // ==========================
+
+    // Animate score ring on scroll
+    const mockupCard = document.querySelector('.mockup-card');
+    if (mockupCard) {
+        const cardObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animated-score')) {
+                    entry.target.classList.add('animated-score');
+
+                    // Trigger score animation
+                    const scoreRingProgress = entry.target.querySelector('.score-ring-progress');
+                    if (scoreRingProgress) {
+                        scoreRingProgress.style.animation = 'drawCircle 2s ease-in-out forwards';
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        cardObserver.observe(mockupCard);
+    }
+
+    // ==========================
+    // STEP CARDS HOVER EFFECT
+    // ==========================
+    const stepCards = document.querySelectorAll('.step-card');
+    stepCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.15}s`;
+
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-12px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // ==========================
+    // FEATURE CARDS STAGGER ANIMATION
+    // ==========================
+    const featureCards = document.querySelectorAll('.feature-card');
+    const featureObserver = new IntersectionObserver(function(entries) {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100);
+            }
+        });
+    }, { threshold: 0.1 });
+
+    featureCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+        featureObserver.observe(card);
+    });
+
+    // ==========================
+    // PROBLEM CARDS ANIMATION
+    // ==========================
+    const problemCards = document.querySelectorAll('.problem-card');
+    const problemObserver = new IntersectionObserver(function(entries) {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateX(0)';
+                }, index * 150);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    problemCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-40px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.15}s, transform 0.6s ease ${index * 0.15}s`;
+        problemObserver.observe(card);
+    });
+
+    // ==========================
+    // SCROLL PROGRESS INDICATOR (header background)
+    // ==========================
+    const header = document.querySelector('.landing-header');
+    if (header) {
+        window.addEventListener('scroll', function() {
+            const scrollProgress = window.pageYOffset;
+
+            if (scrollProgress > 100) {
+                header.style.backgroundColor = 'rgba(10, 14, 26, 0.95)';
+                header.style.borderBottom = '1px solid rgba(0, 212, 255, 0.1)';
+            } else {
+                header.style.backgroundColor = 'transparent';
+                header.style.borderBottom = 'none';
+            }
+        });
+    }
+
+    // ==========================
+    // FORM FIELD FOCUS ENHANCEMENT
+    // ==========================
+    const formControls = document.querySelectorAll('.form-control');
+    formControls.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateX(4px)';
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateX(0)';
+        });
+    });
+
+    // ==========================
+    // ACCORDION SMOOTH EXPAND
+    // ==========================
+    const accordionButtons = document.querySelectorAll('.accordion-button');
+    accordionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Add subtle glow to active accordion
+            setTimeout(() => {
+                const activeItem = document.querySelector('.accordion-button:not(.collapsed)');
+                if (activeItem) {
+                    activeItem.closest('.accordion-item').style.boxShadow = '0 8px 24px rgba(0, 212, 255, 0.15)';
+                }
+
+                // Remove glow from inactive
+                const inactiveItems = document.querySelectorAll('.accordion-button.collapsed');
+                inactiveItems.forEach(item => {
+                    item.closest('.accordion-item').style.boxShadow = 'none';
+                });
+            }, 300);
+        });
+    });
+
+    // ==========================
+    // DYNAMIC METRICS COUNTER (subtle number animation)
+    // ==========================
+    const metricValues = document.querySelectorAll('.metric-value');
+
+    function animateValue(element, start, end, duration) {
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                element.textContent = end;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 16);
+    }
+
+    // Observe metrics for number animation
+    const metricsObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                entry.target.classList.add('counted');
+
+                // Example: if text contains numbers, animate them
+                const text = entry.target.textContent;
+                const numberMatch = text.match(/\d+/);
+
+                if (numberMatch) {
+                    const finalNumber = parseInt(numberMatch[0]);
+                    // Subtle count-up animation could be added here if needed
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    metricValues.forEach(metric => {
+        metricsObserver.observe(metric);
+    });
+
+    // ==========================
+    // PREVENT DOUBLE FORM SUBMISSION
+    // ==========================
+    if (form) {
+        let isSubmitting = false;
+
+        form.addEventListener('submit', function(e) {
+            if (isSubmitting) {
+                e.preventDefault();
+                return false;
+            }
+            isSubmitting = true;
+        });
+    }
+
+    // ==========================
+    // CONSOLE MESSAGE (Easter egg for developers)
+    // ==========================
+    console.log(
+        '%c🚀 Radar de Tendências',
+        'color: #00d4ff; font-size: 20px; font-weight: bold;'
+    );
+    console.log(
+        '%cInteligência de mercado com IA',
+        'color: #94a3b8; font-size: 14px;'
+    );
+    console.log(
+        '%cInteressado em fazer parte da equipe? Entre em contato!',
+        'color: #10b981; font-size: 12px;'
+    );
 });

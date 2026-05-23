@@ -38,12 +38,16 @@ class Lead(models.Model):
     )
 
     email = models.EmailField(
+        blank=True,
+        null=True,
         verbose_name='Email'
     )
 
     price_range = models.CharField(
         max_length=20,
         choices=PRICE_CHOICES,
+        blank=True,
+        null=True,
         verbose_name='Faixa de Preço'
     )
 
@@ -65,4 +69,4 @@ class Lead(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.name} - {self.email}"
+        return f"{self.name} - {self.whatsapp}"
