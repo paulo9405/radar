@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Acesso antecipado confirmado - Radar de Tendências">
+    <title>Acesso Confirmado - Radar de Tendências</title>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'landing/css/style.css' %}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'landing/images/logo_insta.png' %}">
+</head>
+<body class="confirmation-body">
+
+    <!-- Background Watermark -->
+    <div class="logo-watermark">
+        <img src="{% static 'landing/images/logo_insta.png' %}" alt="Radar de Tendências">
+    </div>
+
+    <!-- Header with Logo -->
+    <header class="confirmation-header">
+        <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="header-logo">
+    </header>
+
+    <div class="confirmation-container">
+
+        <!-- Success Animation -->
+        <div class="success-animation">
+            <div class="success-circle">
+                <div class="success-checkmark">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+            </div>
+            <div class="success-glow"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="confirmation-content">
+
+            <!-- Main Headline -->
+            <h1 class="confirmation-title">
+                <span class="check-icon">✅</span>
+                Acesso Antecipado Confirmado
+            </h1>
+
+            <!-- Subtext -->
+            <div class="confirmation-message">
+                <p class="message-primary">
+                    {% if lead_name %}
+                        <strong>{{ lead_name }}</strong>, obrigado por participar da fase de validação do Radar de Tendências.
+                    {% else %}
+                        Obrigado por participar da fase de validação do Radar de Tendências.
+                    {% endif %}
+                </p>
+
+                <p class="message-text">
+                    Sua resposta foi recebida com sucesso e você agora faz parte da lista de acesso antecipado da plataforma.
+                </p>
+
+                <p class="message-text">
+                    Estamos selecionando os primeiros usuários que receberão acesso prioritário ao lançamento inicial e às versões preliminares da plataforma.
+                </p>
+
+                <p class="message-text">
+                    Nossa equipe poderá entrar em contato via WhatsApp ou email para compartilhar atualizações, oportunidades de acesso beta e condições especiais de lançamento.
+                </p>
+
+                <p class="message-highlight">
+                    <i class="bi bi-lightning-fill"></i>
+                    Estamos liberando os acessos gradualmente durante a fase inicial de validação da plataforma.
+                </p>
+            </div>
+
+            <!-- Visual Elements Section -->
+            <div class="visual-elements">
+                <div class="element-card">
+                    <i class="bi bi-graph-up-arrow element-icon"></i>
+                    <span class="element-label">Análise de Tendências</span>
+                </div>
+                <div class="element-card">
+                    <i class="bi bi-radar element-icon"></i>
+                    <span class="element-label">Sistema Radar</span>
+                </div>
+                <div class="element-card">
+                    <i class="bi bi-cpu element-icon"></i>
+                    <span class="element-label">IA Inteligente</span>
+                </div>
+                <div class="element-card">
+                    <i class="bi bi-shield-check element-icon"></i>
+                    <span class="element-label">Dados Confiáveis</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="confirmation-actions">
+
+                <!-- Primary Button - WhatsApp VIP Group -->
+                <a href="#WHATSAPP_GROUP_LINK" class="btn btn-vip" target="_blank" rel="noopener">
+                    <i class="bi bi-whatsapp"></i>
+                    Entrar no Grupo VIP
+                </a>
+
+                <!-- Secondary Button - Instagram -->
+                <a href="#INSTAGRAM_LINK" class="btn btn-secondary-link" target="_blank" rel="noopener">
+                    <i class="bi bi-instagram"></i>
+                    Seguir no Instagram
+                </a>
+            </div>
+
+            <!-- Decorative Radar Visualization -->
+            <div class="radar-visualization">
+                <div class="radar-ring ring-1"></div>
+                <div class="radar-ring ring-2"></div>
+                <div class="radar-ring ring-3"></div>
+                <div class="radar-ping"></div>
+                <div class="radar-center">
+                    <i class="bi bi-bullseye"></i>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Lista de Espera</div>
+                        <div class="stat-value">Ativa</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-rocket-takeoff-fill"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value">Em Validação</div>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-label">Prioridade</div>
+                        <div class="stat-value">Garantida</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Home Link -->
+            <div class="back-home">
+                <a href="{% url 'landing:index' %}" class="back-link">
+                    <i class="bi bi-arrow-left"></i>
+                    Voltar para a página inicial
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Footer Branding -->
+    <footer class="confirmation-footer">
+        <img src="{% static 'landing/images/logo1.png' %}" alt="Radar de Tendências" class="footer-logo">
+        <p class="footer-brand-text">Radar de Tendências</p>
+        <p class="footer-tagline">Descubra produtos com potencial antes de comprar estoque</p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Confirmation Page JavaScript -->
+    <script>
+        // Animate success checkmark on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const successCircle = document.querySelector('.success-circle');
+            const confirmationContent = document.querySelector('.confirmation-content');
+
+            setTimeout(() => {
+                successCircle.classList.add('animate');
+            }, 200);
+
+            setTimeout(() => {
+                confirmationContent.classList.add('show');
+            }, 600);
+
+            // Radar ping animation
+            const radarPing = document.querySelector('.radar-ping');
+            setInterval(() => {
+                radarPing.style.animation = 'none';
+                setTimeout(() => {
+                    radarPing.style.animation = '';
+                }, 10);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
