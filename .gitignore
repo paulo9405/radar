@@ -2,22 +2,29 @@
 *.py[cod]
 *$py.class
 *.so
+.Python
 __pycache__/
-*.egg-info/
-dist/
-build/
+*.pyc
+*.pyo
+*.pyd
 
-# Virtual Environment
+# Virtual environments
 venv/
 env/
 ENV/
+.venv
 
 # Django
 *.log
+local_settings.py
 db.sqlite3
 db.sqlite3-journal
 /staticfiles/
 /media/
+
+# Environment variables
+.env
+.env.local
 
 # IDE
 .vscode/
@@ -25,11 +32,14 @@ db.sqlite3-journal
 *.swp
 *.swo
 *~
-
-# OS
 .DS_Store
-Thumbs.db
 
-# Environment variables
-.env
-.env.local
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
