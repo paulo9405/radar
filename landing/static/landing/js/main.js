@@ -75,15 +75,55 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ==========================
-    // FORM SUBMISSION - Loading state
+    // ENHANCED FORM VALIDATION - Loading state + Scroll to error
     // ==========================
     const form = document.querySelector('form');
 
     if (form) {
+        // Handle client-side validation on submit
         form.addEventListener('submit', function(e) {
-            const submitButton = form.querySelector('.submit-button');
+            // Find all required inputs
+            const inputs = form.querySelectorAll('input[required], textarea[required]');
+            let firstInvalidField = null;
 
-            // Add loading state to button
+            // Check each required field
+            inputs.forEach(input => {
+                // Remove previous error styling
+                input.classList.remove('is-invalid');
+                input.removeAttribute('aria-invalid');
+
+                // Check if field is empty
+                if (!input.value.trim()) {
+                    input.classList.add('is-invalid');
+                    input.setAttribute('aria-invalid', 'true');
+
+                    if (!firstInvalidField) {
+                        firstInvalidField = input;
+                    }
+                }
+            });
+
+            // If there's an invalid field, scroll to it and prevent submission
+            if (firstInvalidField) {
+                e.preventDefault();
+
+                // Scroll to first invalid field smoothly
+                firstInvalidField.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+
+                // Focus the field after scroll completes
+                setTimeout(() => {
+                    firstInvalidField.focus({ preventScroll: true });
+                }, 300);
+
+                return false;
+            }
+
+            // If validation passes, show loading state
+            const submitButton = form.querySelector('.submit-button, .submit-button-conversion');
+
             if (submitButton) {
                 const buttonText = submitButton.querySelector('.button-text');
                 if (buttonText) {
@@ -99,7 +139,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.prepend(spinner);
             }
         });
+
+        // Remove error styling on input
+        const formInputs = form.querySelectorAll('input, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('is-invalid');
+                this.removeAttribute('aria-invalid');
+            });
+        });
     }
+
+    // ==========================
+    // SCROLL TO SERVER-SIDE ERRORS ON PAGE LOAD
+    // ==========================
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if there are any Django form errors displayed
+        const firstError = document.querySelector('.invalid-feedback.d-block');
+
+        if (firstError) {
+            // Find the parent form group
+            const formGroup = firstError.closest('.mb-4');
+
+            if (formGroup) {
+                const input = formGroup.querySelector('input, textarea');
+
+                if (input) {
+                    // Add is-invalid class for styling
+                    input.classList.add('is-invalid');
+                    input.setAttribute('aria-invalid', 'true');
+
+                    // Scroll to the field smoothly
+                    setTimeout(() => {
+                        input.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+
+                        // Focus after scroll
+                        setTimeout(() => {
+                            input.focus({ preventScroll: true });
+                        }, 300);
+                    }, 100);
+                }
+            }
+        }
+    });
 
     // ==========================
     // AUTO-DISMISS ALERTS

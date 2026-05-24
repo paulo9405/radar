@@ -163,7 +163,7 @@ section {
 }
 
 /* ===========================
-   HERO SECTION
+   HERO SECTION - CONVERSION OPTIMIZED
    =========================== */
 .hero-section {
     padding: 200px 0 var(--section-padding) 0;
@@ -207,6 +207,46 @@ section {
     font-size: 1rem;
 }
 
+/* Conversion-focused hero styles */
+.hero-title-conversion {
+    font-size: 3.75rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    color: var(--text-primary);
+}
+
+.hero-subtitle-conversion {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.5;
+    max-width: 650px;
+    font-weight: 400;
+}
+
+.hero-trust-signals {
+    display: flex;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+}
+
+.trust-item i {
+    font-size: 1.25rem;
+    color: var(--success);
+}
+
+/* Legacy hero styles for backwards compatibility */
 .hero-title {
     font-size: 3.5rem;
     font-weight: 800;
@@ -262,6 +302,21 @@ section {
 @media (max-width: 768px) {
     .hero-section {
         padding: 140px 0 60px 0;
+    }
+
+    .hero-title-conversion {
+        font-size: 2.5rem;
+        line-height: 1.1;
+    }
+
+    .hero-subtitle-conversion {
+        font-size: 1.25rem;
+        line-height: 1.45;
+    }
+
+    .hero-trust-signals {
+        flex-direction: column;
+        gap: 1rem;
     }
 
     .hero-title {
@@ -398,11 +453,49 @@ section {
     display: block;
 }
 
+.analysis-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.analysis-header i {
+    font-size: 1.125rem;
+    color: var(--accent-cyan);
+    margin-bottom: 0;
+}
+
+.analysis-badge {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--accent-cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .analysis-text {
     font-size: 0.9375rem;
     color: var(--text-secondary);
     line-height: 1.6;
-    margin: 0;
+    margin: 0 0 1rem 0;
+}
+
+.data-source {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-source i {
+    font-size: 1rem;
+    color: var(--accent-cyan);
+    margin-bottom: 0;
+    display: inline;
 }
 
 /* Metrics Grid */
@@ -535,6 +628,14 @@ section {
     color: var(--text-primary);
 }
 
+.score-subtitle {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 .confidence {
     font-size: 0.875rem;
     color: var(--success);
@@ -621,12 +722,71 @@ section {
 }
 
 /* ===========================
-   PROBLEM SECTION
+   PROBLEM/PAIN SECTION - CONVERSION OPTIMIZED
    =========================== */
 .problem-section {
     background: var(--bg-primary);
 }
 
+.pain-section-conversion {
+    background: var(--bg-secondary);
+    padding: var(--section-padding) 0;
+}
+
+.section-title-conversion {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.pain-intro {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+    text-align: center;
+    font-weight: 500;
+}
+
+.pain-card-conversion {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    margin-bottom: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.pain-card-conversion:hover {
+    border-color: rgba(239, 68, 68, 0.4);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.1);
+}
+
+.pain-card-conversion i {
+    font-size: 2rem;
+    color: var(--error);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.pain-card-conversion h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.pain-card-conversion p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Legacy problem section styles */
 .problem-text {
     font-size: 1.125rem;
     color: var(--text-secondary);
@@ -701,6 +861,20 @@ section {
     line-height: 1.5;
 }
 
+@media (max-width: 768px) {
+    .section-title-conversion {
+        font-size: 2rem;
+    }
+
+    .pain-intro {
+        font-size: 1.125rem;
+    }
+
+    .pain-card-conversion {
+        padding: 1.5rem;
+    }
+}
+
 /* ===========================
    FEATURES SECTION
    =========================== */
@@ -768,10 +942,111 @@ section {
 }
 
 /* ===========================
-   FORM SECTION
+   BENEFITS SECTION - CONVERSION OPTIMIZED
+   =========================== */
+.benefits-section-conversion {
+    background: var(--bg-primary);
+    padding: var(--section-padding) 0;
+}
+
+.benefit-item-conversion {
+    background: var(--bg-card);
+    padding: 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+.benefit-item-conversion:hover {
+    border-color: rgba(0, 212, 255, 0.3);
+    transform: translateX(8px);
+    box-shadow: 0 12px 30px rgba(0, 212, 255, 0.1);
+}
+
+.benefit-item-conversion i {
+    font-size: 2.25rem;
+    color: var(--accent-cyan);
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.benefit-item-conversion h4 {
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.benefit-item-conversion p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .benefit-item-conversion {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+
+    .benefit-item-conversion i {
+        font-size: 2rem;
+    }
+
+    .benefit-item-conversion h4 {
+        font-size: 1.25rem;
+    }
+}
+
+/* ===========================
+   FORM SECTION - CONVERSION OPTIMIZED
    =========================== */
 .form-section {
     background: var(--bg-primary);
+}
+
+.form-section-conversion {
+    background: var(--bg-secondary);
+    padding: var(--section-padding) 0;
+}
+
+.form-header-conversion {
+    margin-bottom: 3rem;
+}
+
+.form-badge-conversion {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(124, 58, 237, 0.1));
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    color: var(--accent-cyan);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.5rem 1.125rem;
+    border-radius: 30px;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.form-title-conversion {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.form-subtitle-conversion {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
 }
 
 .form-badge {
@@ -800,6 +1075,16 @@ section {
     border-radius: 20px;
     border: 1px solid rgba(0, 212, 255, 0.15);
     box-shadow: var(--shadow-elevated);
+}
+
+.form-card-conversion {
+    background: var(--bg-card);
+    padding: 2.5rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    box-shadow: var(--shadow-elevated);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 /* Form Controls */
@@ -833,6 +1118,30 @@ section {
     opacity: 0.6;
 }
 
+.form-control.is-invalid {
+    border-color: var(--error);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.form-control.is-invalid:focus {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.invalid-feedback {
+    color: var(--error);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+.form-text {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+}
+
 .submit-button {
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
     border: none;
@@ -854,6 +1163,29 @@ section {
     box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
 }
 
+.submit-button-conversion {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    border: none;
+    padding: 1.25rem 2.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 12px 35px rgba(0, 212, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    color: var(--text-primary);
+}
+
+.submit-button-conversion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px rgba(0, 212, 255, 0.5);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+}
+
 .form-footer-text {
     text-align: center;
     margin-top: 1.5rem;
@@ -866,6 +1198,29 @@ section {
 }
 
 .form-footer-text i {
+    color: var(--success);
+}
+
+.form-footer-trust {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    flex-wrap: wrap;
+}
+
+.trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.trust-badge i {
+    font-size: 1rem;
     color: var(--success);
 }
 
@@ -887,13 +1242,32 @@ section {
     .form-card {
         padding: 2rem 1.5rem;
     }
+
+    .form-card-conversion {
+        padding: 2rem 1.5rem;
+    }
+
+    .form-footer-trust {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .submit-button-conversion {
+        font-size: 1.125rem;
+        padding: 1.125rem 2rem;
+    }
 }
 
 /* ===========================
-   FAQ SECTION
+   FAQ SECTION - CONVERSION OPTIMIZED
    =========================== */
 .faq-section {
     background: var(--bg-secondary);
+}
+
+.faq-section-conversion {
+    background: var(--bg-primary);
+    padding: var(--section-padding) 0;
 }
 
 .accordion {
@@ -941,6 +1315,18 @@ section {
     font-size: 1.0625rem;
     padding: 1.5rem 1.75rem;
     line-height: 1.65;
+}
+
+@media (max-width: 768px) {
+    .accordion-button {
+        font-size: 1rem;
+        padding: 1.25rem 1.5rem;
+    }
+
+    .accordion-body {
+        font-size: 1rem;
+        padding: 1.25rem 1.5rem;
+    }
 }
 
 /* ===========================
@@ -1085,4 +1471,216 @@ html {
 /* SVG Gradient Definition (add to mockup card) */
 svg defs {
     position: absolute;
+}
+
+/* ===========================
+   CONFIRMATION PAGE
+   =========================== */
+.confirmation-page {
+    background: var(--bg-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 0;
+}
+
+.confirmation-wrapper {
+    width: 100%;
+    padding: 2rem 1rem;
+}
+
+.confirmation-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 212, 255, 0.15);
+    border-radius: 24px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-elevated);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.confirmation-card.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.confirmation-logo {
+    margin-bottom: 2rem;
+}
+
+.confirmation-logo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 10px rgba(0, 212, 255, 0.3));
+}
+
+.success-icon {
+    margin-bottom: 1.5rem;
+}
+
+.success-icon i {
+    font-size: 4rem;
+    color: var(--success);
+    animation: scaleIn 0.5s ease;
+}
+
+.confirmation-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.confirmation-subtitle {
+    font-size: 1.25rem;
+    color: var(--accent-cyan);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.confirmation-body {
+    text-align: left;
+    margin-bottom: 2.5rem;
+}
+
+.confirmation-body p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.confirmation-body strong {
+    color: var(--text-primary);
+}
+
+.highlight-box {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.highlight-box i {
+    font-size: 1.5rem;
+    color: var(--success);
+    flex-shrink: 0;
+    margin-top: 0.2rem;
+}
+
+.highlight-box p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+.small-note {
+    font-size: 0.875rem !important;
+    color: var(--text-muted) !important;
+    font-style: italic;
+}
+
+.confirmation-actions {
+    margin-top: 2rem;
+}
+
+.btn-confirmation-primary {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    color: var(--text-primary);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+}
+
+.btn-confirmation-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.5);
+    color: var(--text-primary);
+    text-decoration: none;
+}
+
+.btn-confirmation-primary i {
+    font-size: 1.125rem;
+}
+
+.confirmation-footer-text {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+}
+
+.confirmation-footer-text p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .confirmation-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .confirmation-logo img {
+        height: 40px;
+    }
+
+    .success-icon i {
+        font-size: 3rem;
+    }
+
+    .confirmation-title {
+        font-size: 1.5rem;
+    }
+
+    .confirmation-subtitle {
+        font-size: 1.125rem;
+    }
+
+    .confirmation-body p {
+        font-size: 0.9375rem;
+    }
+
+    .btn-confirmation-primary {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .confirmation-wrapper {
+        padding: 1rem 0.5rem;
+    }
+
+    .confirmation-card {
+        padding: 1.5rem 1rem;
+    }
+}
+
+/* Success icon animation */
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
