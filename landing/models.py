@@ -23,12 +23,16 @@ class Lead(models.Model):
 
     name = models.CharField(
         max_length=200,
-        verbose_name='Nome'
+        verbose_name='Nome',
+        blank=True,
+        null=True
     )
 
     niche = models.CharField(
         max_length=300,
-        verbose_name='Nicho/Produto'
+        verbose_name='Nicho/Produto',
+        blank=True,
+        null=True
     )
 
     whatsapp = models.CharField(
@@ -69,4 +73,4 @@ class Lead(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.name} - {self.whatsapp}"
+        return f"{self.name or 'Lead'} - {self.whatsapp}"
