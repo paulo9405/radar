@@ -41,6 +41,7 @@ def exchange_code_for_token(code: str) -> dict:
     """
     url = "https://api.mercadolibre.com/oauth/token"
 
+    # Mercado Livre expects form data, not JSON
     data = {
         'grant_type': 'authorization_code',
         'client_id': settings.MERCADO_LIVRE_CLIENT_ID,
@@ -49,8 +50,14 @@ def exchange_code_for_token(code: str) -> dict:
         'redirect_uri': settings.MERCADO_LIVRE_REDIRECT_URI
     }
 
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
     try:
-        response = requests.post(url, json=data, timeout=10)
+        # Send as form data, not JSON!
+        response = requests.post(url, data=data, headers=headers, timeout=10)
 
         if response.status_code == 200:
             token_data = response.json()
@@ -60,9 +67,11 @@ def exchange_code_for_token(code: str) -> dict:
             cache.set('ml_refresh_token', token_data.get('refresh_token'), timeout=15552000)  # 180 days
             cache.set('ml_token_timestamp', int(time.time()))
 
+            print(f"[ML OAuth] ✅ Token exchange successful!")
             return token_data
         else:
-            print(f"[ML OAuth] Token exchange failed: {response.status_code}")
+            print(f"[ML OAuth] ❌ Token exchange failed: {response.status_code}")
+            print(f"[ML OAuth] Response: {response.text}")
             return {}
 
     except Exception as e:
@@ -112,8 +121,14 @@ def _refresh_access_token(refresh_token: str) -> str:
         'refresh_token': refresh_token
     }
 
+    headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
     try:
-        response = requests.post(url, json=data, timeout=10)
+        # Send as form data, not JSON!
+        response = requests.post(url, data=data, headers=headers, timeout=10)
 
         if response.status_code == 200:
             token_data = response.json()
