@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise: {{ query }} - Radar de Tendências</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+        .result-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+        .header .product-name {
+            color: #667eea;
+            font-weight: 700;
+        }
+        .score-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .final-score {
+            text-align: center;
+            padding: 30px;
+        }
+        .final-score .score-number {
+            font-size: 4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .final-score .classification {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .score-excellent { color: #28a745; }
+        .score-good { color: #17a2b8; }
+        .score-risky { color: #ffc107; }
+        .score-bad { color: #dc3545; }
+        .individual-scores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .score-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .score-item .label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+        }
+        .score-item .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+        }
+        .summary-box {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .locked-features {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 2px dashed #dee2e6;
+        }
+        .locked-features h3 {
+            color: #6c757d;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        .locked-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+        .locked-item::before {
+            content: "🔒";
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        .cta-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .btn-unlock {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 12px 40px;
+            font-weight: 600;
+            border-radius: 25px;
+            margin-top: 15px;
+        }
+        .btn-new-search {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        .confidence-badge {
+            display: inline-block;
+            background: #e7f3ff;
+            color: #007bff;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .source-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .source-api {
+            background: #d4edda;
+            color: #155724;
+        }
+        .source-mock {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div class="header">
+            <h1>Análise: <span class="product-name">{{ query }}</span></h1>
+            <small class="text-muted">ID da busca: #{{ search_id }}</small>
+            <span class="confidence-badge">Confiança: {{ analysis.confidence_level }}%</span>
+            <br><br>
+            <small class="text-muted">Fontes de dados:</small>
+            {% if analysis.data_sources.marketplace == 'mercado_livre_api' %}
+                <span class="source-badge source-api">✓ Mercado Livre API</span>
+            {% else %}
+                <span class="source-badge source-mock">⚠ Mercado Livre (Mock)</span>
+            {% endif %}
+            {% if analysis.data_sources.trends == 'google_trends_api' %}
+                <span class="source-badge source-api">✓ Google Trends API</span>
+            {% else %}
+                <span class="source-badge source-mock">⚠ Google Trends (Mock)</span>
+            {% endif %}
+        </div>
+
+        <div class="score-card">
+            <div class="final-score">
+                <p class="score-number score-{{ analysis.classification }}">
+                    {{ analysis.scores.final }}
+                </p>
+                <p class="classification score-{{ analysis.classification }}">
+                    {{ analysis.classification_label }}
+                </p>
+            </div>
+
+            <div class="individual-scores">
+                <div class="score-item">
+                    <div class="label">📈 Demanda (35%)</div>
+                    <div class="value">{{ analysis.scores.demand }}</div>
+                </div>
+                <div class="score-item">
+                    <div class="label">🏪 Concorrência (30%)</div>
+                    <div class="value">{{ analysis.scores.competition }}</div>
+                </div>
+                <div class="score-item">
+                    <div class="label">⚖️ Saturação (20%)</div>
+                    <div class="value">{{ analysis.scores.saturation }}</div>
+                </div>
+                <div class="score-item">
+                    <div class="label">💰 Preço (15%)</div>
+                    <div class="value">{{ analysis.scores.price }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="score-card">
+            <h3>📊 Resumo da Análise</h3>
+            <div class="summary-box">
+                {{ analysis.summary }}
+            </div>
+        </div>
+
+        {% if analysis.locked_fields %}
+        <div class="locked-features">
+            <h3>🔒 Recursos Premium Bloqueados</h3>
+            <p class="text-muted">
+                Faça upgrade para acessar análises completas:
+            </p>
+            {% for locked_feature in analysis.locked_fields %}
+                <div class="locked-item">
+                    {{ locked_feature }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="cta-box">
+            <h3>Quer a análise completa?</h3>
+            <p>
+                Desbloqueie acesso ilimitado a análises detalhadas, histórico,
+                alertas e muito mais.
+            </p>
+            <button class="btn btn-unlock">
+                Desbloquear Acesso Premium
+            </button>
+        </div>
+        {% endif %}
+
+        <div class="text-center">
+            <a href="{% url 'market:test' %}" class="btn-new-search">
+                ← Nova Análise
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

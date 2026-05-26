@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'landing',
+    'market',
 ]
 
 MIDDLEWARE = [
@@ -170,3 +171,14 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
+
+
+# Mercado Livre API Configuration
+# These credentials should ONLY be stored in .env file
+# Never commit credentials to version control
+MERCADO_LIVRE_CLIENT_ID = config('MERCADO_LIVRE_CLIENT_ID', default='')
+MERCADO_LIVRE_CLIENT_SECRET = config('MERCADO_LIVRE_CLIENT_SECRET', default='')
+MERCADO_LIVRE_REDIRECT_URI = config(
+    'MERCADO_LIVRE_REDIRECT_URI',
+    default='http://localhost:8000/market/mercadolivre/callback/'
+)

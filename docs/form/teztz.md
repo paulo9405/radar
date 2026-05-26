@@ -1,390 +1,166 @@
-● I'll create a comprehensive architecture and structure proposal for the Trends Radar landing page. Let me present the complete plan.
 
-  PROJECT ARCHITECTURE PROPOSAL
+● Perfect! The MVP foundation of the market app has been successfully implemented. Here's the complete summary:
 
-  1. DJANGO PROJECT STRUCTURE
+  Implementation Complete
 
-  radar/
-  ├── radar/                      # Main project folder
+  Files Created
+
+  Market App Structure:
+  market/
+  ├── admin.py                 (Django admin configuration)
+  ├── apps.py                  (App configuration)
+  ├── models.py                (ProductSearch & MarketAnalysis models)
+  ├── views.py                 (View with form validation)
+  ├── urls.py                  (URL routing)
+  ├── services/
   │   ├── __init__.py
-  │   ├── settings.py            # Project settings (modified)
-  │   ├── urls.py                # Main URL config
-  │   ├── wsgi.py
-  │   └── asgi.py
-  ├── landing/                    # Landing page app
-  │   ├── __init__.py
-  │   ├── models.py              # Lead model
-  │   ├── views.py               # Form handling and page view
-  │   ├── urls.py                # App URLs
-  │   ├── forms.py               # Lead form
-  │   ├── admin.py               # Admin configuration
-  │   ├── apps.py
-  │   ├── migrations/
-  │   │   └── __init__.py
-  │   ├── templates/
-  │   │   └── landing/
-  │   │       ├── index.html     # Main landing page
-  │   │       ├── base.html      # Base template (optional)
-  │   │       └── partials/      # Reusable components
-  │   │           ├── hero.html
-  │   │           ├── pain.html
-  │   │           ├── features.html
-  │   │           ├── benefits.html
-  │   │           ├── early_access.html
-  │   │           └── faq.html
-  │   └── static/
-  │       └── landing/
-  │           ├── css/
-  │           │   └── style.css  # Custom styles
-  │           ├── js/
-  │           │   └── main.js    # Form interactions, animations
-  │           └── images/
-  │               └── (mockup images if needed)
-  ├── manage.py
-  └── requirements.txt
+  │   ├── analyzer.py          (Main orchestrator with basic/premium modes)
+  │   ├── scoring.py           (Scoring engine with roadmap formula)
+  │   ├── mercado_livre.py     (Mock Mercado Livre provider)
+  │   └── google_trends.py     (Mock Google Trends provider)
+  └── templates/market/
+      ├── test.html            (Search form page)
+      └── result.html          (Analysis results page)
 
-  ---
-  2. DATABASE MODEL
+  Migrations:
+  - market/migrations/0001_initial.py (ProductSearch and MarketAnalysis tables)
 
-  landing/models.py
-  from django.db import models
-  from django.core.validators import RegexValidator
+  Files Modified
 
-  class Lead(models.Model):
-      PRICE_CHOICES = [
-          ('29', 'R$29/month'),
-          ('49', 'R$49/month'),
-          ('99', 'R$99/month'),
-          ('annual', 'Would pay annual plan with discount'),
-          ('free_first', 'Would only try it free first'),
-          ('other', 'Other'),
-      ]
+  1. radar_project/settings.py - Added 'market' to INSTALLED_APPS
+  2. radar_project/urls.py - Added path('market/', include('market.urls'))
 
-      name = models.CharField(max_length=200, verbose_name='Name')
-      niche = models.CharField(max_length=300, verbose_name='Niche/Product')
+  Database Models
 
-      phone_regex = RegexValidator(
-          regex=r'^\+?1?\d{9,15}$',
-          message="Phone number must be entered in valid format."
-      )
-      whatsapp = models.CharField(
-          validators=[phone_regex],
-          max_length=17,
-          verbose_name='WhatsApp'
-      )
+  ProductSearch:
+  - query (max 100 chars, indexed)
+  - created_at (auto-generated, indexed)
+  - source (landing/dashboard/api)
+  - is_public_test (boolean)
+  - ip_address (optional)
+  - user (optional, prepared for future auth)
 
-      email = models.EmailField(verbose_name='Email')
-      price_range = models.CharField(
-          max_length=20,
-          choices=PRICE_CHOICES,
-          verbose_name='Price Range'
-      )
-      created_at = models.DateTimeField(auto_now_add=True)
+  MarketAnalysis:
+  - product_search (OneToOne relationship)
+  - demand_score, competition_score, saturation_score, price_score (0-10)
+  - final_score (weighted average, indexed)
+  - classification (bad/risky/good/excellent)
+  - confidence_level (0-100%)
+  - summary (AI-generated text)
+  - raw_data (JSON field with provider data)
+  - created_at (auto-generated)
 
-      class Meta:
-          verbose_name = 'Lead'
-          verbose_name_plural = 'Leads'
-          ordering = ['-created_at']
+  Scoring Formula (from Roadmap)
 
-      def __str__(self):
-          return f"{self.name} - {self.email}"
+  - Demand (Tendência): 35%
+  - Competition (Concorrência): 30%
+  - Saturation (Saturação): 20%
+  - Price/Margin (Preço): 15%
 
-  ---
-  3. FORMS
+  Classification Ranges
 
-  landing/forms.py
-  from django import forms
-  from .models import Lead
+  - 0-3: Produto ruim
+  - 4-6: Arriscado
+  - 7-8: Boa oportunidade
+  - 9-10: Alta oportunidade
 
-  class LeadForm(forms.ModelForm):
-      class Meta:
-          model = Lead
-          fields = ['name', 'niche', 'whatsapp', 'email', 'price_range']
-          widgets = {
-              'name': forms.TextInput(attrs={
-                  'class': 'form-control',
-                  'placeholder': 'Your name'
-              }),
-              'niche': forms.TextInput(attrs={
-                  'class': 'form-control',
-                  'placeholder': 'e.g., Electronics, Fashion, Home decor'
-              }),
-              'whatsapp': forms.TextInput(attrs={
-                  'class': 'form-control',
-                  'placeholder': '+55 11 99999-9999'
-              }),
-              'email': forms.EmailInput(attrs={
-                  'class': 'form-control',
-                  'placeholder': 'your@email.com'
-              }),
-              'price_range': forms.Select(attrs={
-                  'class': 'form-select'
-              }),
-          }
+  Features Implemented
 
-  ---
-  4. VIEWS
+  Form Validation:
+  - Required field
+  - Trim whitespace
+  - Minimum 2 characters
+  - Maximum 100 characters
+  - Clear error messages
 
-  landing/views.py
-  from django.shortcuts import render, redirect
-  from django.contrib import messages
-  from .forms import LeadForm
+  Analysis Modes:
+  - basic (free) - Shows scores and summary, locks premium features
+  - premium (paid) - Full access to detailed data (prepared for future)
 
-  def index(request):
-      if request.method == 'POST':
-          form = LeadForm(request.POST)
-          if form.is_valid():
-              form.save()
-              messages.success(
-                  request,
-                  'Registration received. You have joined the Trends Radar early access list.'
-              )
-              return redirect('landing:index')
-      else:
-          form = LeadForm()
+  Mock Data:
+  - Deterministic (same product = same results)
+  - Based on query hash for consistency
+  - Fully separated providers (easy to replace with real APIs)
 
-      return render(request, 'landing/index.html', {'form': form})
+  Admin Panel:
+  - ProductSearch admin with filters and search
+  - MarketAnalysis admin (read-only, auto-generated)
+  - Custom list displays and methods
 
-  ---
-  5. URL CONFIGURATION
+  Commands Executed
 
-  landing/urls.py
-  from django.urls import path
-  from . import views
+  python manage.py startapp market
+  python manage.py makemigrations
+  python manage.py migrate
+  python manage.py check
 
-  app_name = 'landing'
+  All commands executed successfully with no errors.
 
-  urlpatterns = [
-      path('', views.index, name='index'),
-  ]
+  How to Test
 
-  radar/urls.py (main project)
-  from django.contrib import admin
-  from django.urls import path, include
+  1. Start the development server:
+  python manage.py runserver
+  2. Access the test page:
+  http://127.0.0.1:8000/market/test/
+  3. Try these example products:
+    - "Luminária Sunset"
+    - "Mini impressora térmica"
+    - "Projetor portátil"
+    - "Organizador de mesa"
+  4. Expected behavior:
+    - Enter a product name
+    - Receive analysis with:
+        - Final score (0-10)
+      - Classification (Produto ruim → Alta oportunidade)
+      - Individual scores for demand, competition, saturation, price
+      - AI-generated summary
+      - Locked premium features
+      - CTA for premium upgrade
+  5. Verify in Django Admin:
+  http://127.0.0.1:8000/admin/
+    - Check Market > Product Searches
+    - Check Market > Market Analyses
 
-  urlpatterns = [
-      path('admin/', admin.site.urls),
-      path('', include('landing.urls')),
-  ]
+  Key Technical Highlights
 
-  ---
-  6. ADMIN CONFIGURATION
+  Service Abstraction:
+  - Each data provider is isolated in its own file
+  - Easy to replace mock data with real API calls
+  - TODO comments mark integration points
 
-  landing/admin.py
-  from django.contrib import admin
-  from .models import Lead
+  Deterministic Mock Data:
+  - Uses MD5 hash of query for consistency
+  - Same product always returns same scores
+  - Realistic data ranges
 
-  @admin.register(Lead)
-  class LeadAdmin(admin.ModelAdmin):
-      list_display = ['name', 'email', 'whatsapp', 'niche', 'price_range', 'created_at']
-      list_filter = ['price_range', 'created_at']
-      search_fields = ['name', 'email', 'niche']
-      readonly_fields = ['created_at']
-      date_hierarchy = 'created_at'
+  Prepared for Future:
+  - User authentication (foreign key ready)
+  - Premium mode structure complete
+  - Locked features list prepared
+  - IP tracking for rate limiting
 
-  ---
-  7. SETTINGS.PY MODIFICATIONS
+  No Breaking Changes:
+  - Landing app untouched
+  - Only added new routes
+  - Completely isolated functionality
 
-  # Add to INSTALLED_APPS
-  INSTALLED_APPS = [
-      'django.contrib.admin',
-      'django.contrib.auth',
-      'django.contrib.contenttypes',
-      'django.contrib.sessions',
-      'django.contrib.messages',
-      'django.contrib.staticfiles',
-      'landing',  # NEW
-  ]
+  Next Steps (Future Phases)
 
-  # Static files configuration
-  STATIC_URL = '/static/'
-  STATIC_ROOT = BASE_DIR / 'staticfiles'
+  According to the roadmap:
 
-  # Language and timezone (optional - keep as is or adjust)
-  LANGUAGE_CODE = 'en-us'
-  TIME_ZONE = 'America/Sao_Paulo'  # or your timezone
+  Week 2:
+  - Replace mock data with real Mercado Livre API
+  - Integrate Google Trends (pytrends)
+  - Refine scoring algorithm with real data
 
-  ---
-  8. LANDING PAGE SECTIONS WIREFRAME
+  Week 3:
+  - Build dashboard
+  - Add search history
+  - User authentication
 
-  Structure flow:
+  Week 4:
+  - Polish UI/UX
+  - Deploy updates
+  - Collect user feedback
 
-  ┌─────────────────────────────────────────────┐
-  │  NAVIGATION (optional minimal nav/logo)     │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  1. HERO SECTION                            │
-  │  - Headline + Subheadline                   │
-  │  - CTA Button (scroll to form)              │
-  │  - Product Analysis Mockup Card (visual)    │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  2. PAIN SECTION                            │
-  │  - Title + Description                      │
-  │  - 5 pain point bullets (icons + text)     │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  3. WHAT THE AI ANALYZES                    │
-  │  - Grid of 8 feature cards                 │
-  │  - Each with icon + title + brief text     │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  4. BENEFITS SECTION                        │
-  │  - Title                                    │
-  │  - 5 benefit items (checkmarks + text)     │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  5. EARLY ACCESS SECTION + FORM             │
-  │  - Title + description                      │
-  │  - Form card (centered, elevated)           │
-  │  - Submit button                            │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  6. FAQ SECTION                             │
-  │  - 4 Q&A items (accordion or simple)       │
-  └─────────────────────────────────────────────┘
-
-  ┌─────────────────────────────────────────────┐
-  │  FOOTER (minimal)                           │
-  │  - Copyright, maybe social links            │
-  └─────────────────────────────────────────────┘
-
-  ---
-  9. VISUAL STRATEGY
-
-  Color Palette:
-  - Background: #0a0e1a (deep dark blue/black)
-  - Secondary background: #131825 (slightly lighter)
-  - Accent primary: #00d4ff (cyan/neon blue)
-  - Accent secondary: #0066ff (electric blue)
-  - Text primary: #ffffff
-  - Text secondary: #a0aec0 (muted gray)
-  - Card backgrounds: #1a1f2e with subtle gradient
-  - Success green: #00ff88 (for positive indicators)
-
-  Typography:
-  - Headings: Inter, -apple-system, system-ui (clean, modern)
-  - Body: Same as headings for consistency
-  - Font weights: 300 (light), 400 (regular), 600 (semibold), 700 (bold)
-
-  Component Design:
-
-  1. Hero Mockup Card:
-    - Floating card with subtle shadow and glow
-    - Gradient border (cyan to blue)
-    - Stats displayed in clean grid
-    - Score displayed prominently with radial gradient
-    - Confidence indicator with color coding
-  2. Feature Cards:
-    - Dark background with subtle border
-    - Icon at top (Bootstrap Icons)
-    - Hover effect: subtle lift + glow
-    - 2x4 or 4x2 grid on desktop, stack on mobile
-  3. Form Design:
-    - Centered card, max-width 600px
-    - Dark input fields with cyan focus border
-    - Large, prominent submit button with gradient
-    - Clean spacing between fields
-    - Success message: full-width banner with icon
-  4. Buttons:
-    - Primary CTA: Gradient (cyan to blue) + hover glow
-    - Large padding, rounded corners
-    - Smooth transitions
-  5. Spacing:
-    - Large section padding: 100px top/bottom (desktop)
-    - Medium padding: 60px (tablet)
-    - Mobile padding: 40px
-    - Generous whitespace between elements
-
-  Animations:
-  - Fade in on scroll (hero, sections)
-  - Subtle hover effects (cards, buttons)
-  - Smooth transitions (0.3s ease)
-  - Form submit animation
-  - NO excessive animations - keep it professional
-
-  Responsive Breakpoints:
-  - Mobile: < 768px (stack everything)
-  - Tablet: 768px - 1024px
-  - Desktop: > 1024px
-
-  ---
-  10. TECHNICAL IMPLEMENTATION NOTES
-
-  Dependencies needed (requirements.txt):
-  Django>=4.2,<5.0
-
-  Bootstrap & Icons:
-  - Use Bootstrap 5.3 CDN for speed
-  - Bootstrap Icons CDN
-  - Custom CSS for dark theme overrides
-
-  JavaScript:
-  - Smooth scroll to form on CTA click
-  - Form validation enhancement
-  - Scroll animations (Intersection Observer API)
-  - Simple, vanilla JS - no heavy frameworks
-
-  SEO Basics:
-  - Meta tags for title, description
-  - Open Graph tags for social sharing
-  - Viewport meta tag
-  - Favicon
-
-  ---
-  11. DEVELOPMENT CHECKLIST
-
-  Phase 1: Setup
-  - Create Django project
-  - Create landing app
-  - Configure settings.py
-  - Set up static files
-
-  Phase 2: Backend
-  - Create Lead model
-  - Create LeadForm
-  - Configure admin
-  - Create view and URL routing
-  - Run migrations
-
-  Phase 3: Frontend
-  - Build base template structure
-  - Hero section
-  - Pain section
-  - Features section
-  - Benefits section
-  - Form section
-  - FAQ section
-  - Footer
-
-  Phase 4: Styling
-  - Custom CSS (dark theme, gradients)
-  - Responsive design
-  - Animations
-  - Form styling
-
-  Phase 5: Testing
-  - Form submission test
-  - Mobile responsiveness
-  - Cross-browser check
-  - Admin panel check
-
-  ---
-  SUMMARY
-
-  This architecture prioritizes:
-  - Simplicity: Single app, minimal dependencies
-  - Speed: Quick to implement, fast to load
-  - Clean code: Organized structure, reusable components
-  - Scalability: Easy to add features later if validated
-  - Professional look: Modern SaaS aesthetic
-
-  The approach uses Django's built-in features (forms, admin, messages) without overengineering. Bootstrap provides the responsive foundation, while custom CSS creates the premium dark mode aesthetic.
-
-  Ready to proceed with implementation? I'll wait for your approval before creating any files.
+  The foundation is now complete and ready for real API integrations!

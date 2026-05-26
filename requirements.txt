@@ -13,3 +13,6 @@ psycopg2-binary==2.9.9
 
 # Environment variables
 python-decouple==3.8
+
+# HTTP requests for API integration
+requests==2.31.0
