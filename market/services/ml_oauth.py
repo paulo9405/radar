@@ -2,26 +2,39 @@
 Mercado Livre OAuth handler.
 
 Manages OAuth flow and token storage for Mercado Livre API access.
+Uses PKCE (Proof Key for Code Exchange) for enhanced security.
 """
 import requests
 from django.conf import settings
 from django.core.cache import cache
 import time
+import secrets
+import hashlib
+import base64
 
 
 def get_authorization_url() -> str:
     """
-    Generates the Mercado Livre OAuth authorization URL.
+    Generates the Mercado Livre OAuth authorization URL with PKCE.
 
     Returns:
         str: Authorization URL to redirect user
     """
+    # Generate PKCE code verifier and challenge
+    code_verifier = _generate_code_verifier()
+    code_challenge = _generate_code_challenge(code_verifier)
+
+    # Store code_verifier in cache for later use
+    cache.set('ml_code_verifier', code_verifier, timeout=600)  # 10 minutes
+
     base_url = "https://auth.mercadolivre.com.br/authorization"
 
     params = {
         'response_type': 'code',
         'client_id': settings.MERCADO_LIVRE_CLIENT_ID,
-        'redirect_uri': settings.MERCADO_LIVRE_REDIRECT_URI
+        'redirect_uri': settings.MERCADO_LIVRE_REDIRECT_URI,
+        'code_challenge': code_challenge,
+        'code_challenge_method': 'S256'
     }
 
     # Build URL with params
@@ -29,9 +42,42 @@ def get_authorization_url() -> str:
     return f"{base_url}?{param_string}"
 
 
+def _generate_code_verifier() -> str:
+    """
+    Generates a random code verifier for PKCE.
+
+    Returns:
+        str: Base64 URL-encoded random string
+    """
+    # Generate 32 random bytes
+    random_bytes = secrets.token_bytes(32)
+    # Base64 URL encode
+    code_verifier = base64.urlsafe_b64encode(random_bytes).decode('utf-8')
+    # Remove padding
+    return code_verifier.rstrip('=')
+
+
+def _generate_code_challenge(code_verifier: str) -> str:
+    """
+    Generates code challenge from code verifier using SHA256.
+
+    Args:
+        code_verifier: Random code verifier
+
+    Returns:
+        str: Base64 URL-encoded SHA256 hash of code_verifier
+    """
+    # SHA256 hash
+    sha256_hash = hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    # Base64 URL encode
+    code_challenge = base64.urlsafe_b64encode(sha256_hash).decode('utf-8')
+    # Remove padding
+    return code_challenge.rstrip('=')
+
+
 def exchange_code_for_token(code: str) -> dict:
     """
-    Exchanges authorization code for access token.
+    Exchanges authorization code for access token using PKCE.
 
     Args:
         code: Authorization code from OAuth callback
@@ -41,13 +87,21 @@ def exchange_code_for_token(code: str) -> dict:
     """
     url = "https://api.mercadolibre.com/oauth/token"
 
-    # Mercado Livre expects form data, not JSON
+    # Get stored code_verifier
+    code_verifier = cache.get('ml_code_verifier')
+
+    if not code_verifier:
+        print("[ML OAuth] ❌ No code_verifier found in cache!")
+        return {}
+
+    # Mercado Livre expects form data with PKCE
     data = {
         'grant_type': 'authorization_code',
         'client_id': settings.MERCADO_LIVRE_CLIENT_ID,
         'client_secret': settings.MERCADO_LIVRE_CLIENT_SECRET,
         'code': code,
-        'redirect_uri': settings.MERCADO_LIVRE_REDIRECT_URI
+        'redirect_uri': settings.MERCADO_LIVRE_REDIRECT_URI,
+        'code_verifier': code_verifier  # PKCE requirement
     }
 
     headers = {
