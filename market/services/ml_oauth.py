@@ -16,7 +16,7 @@ def get_authorization_url() -> str:
     Returns:
         str: Authorization URL to redirect user
     """
-    base_url = "https://auth.mercadolibre.com.br/authorization"
+    base_url = "https://auth.mercadolivre.com.br/authorization"
 
     params = {
         'response_type': 'code',
