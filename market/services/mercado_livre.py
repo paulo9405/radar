@@ -1,13 +1,14 @@
 """
 Mercado Livre data provider.
 
-Integrates with official Mercado Livre API.
-Falls back to deterministic mock data if API fails or is not configured.
+Integrates with official Mercado Livre API using OAuth.
+Falls back to deterministic mock data if API fails or is not authorized.
 """
 import hashlib
 import requests
 from typing import Optional
 from django.conf import settings
+from . import ml_oauth
 
 
 def is_configured() -> bool:
@@ -23,13 +24,23 @@ def is_configured() -> bool:
     )
 
 
+def is_authorized() -> bool:
+    """
+    Checks if we have OAuth authorization.
+
+    Returns:
+        bool: True if authorized
+    """
+    return ml_oauth.is_authorized()
+
+
 def get_marketplace_data(query: str) -> dict:
     """
     Fetches marketplace data for a given product query.
 
-    Uses real Mercado Livre API if configured.
+    Uses real Mercado Livre API with OAuth if authorized.
     Falls back to deterministic mock data if:
-    - API is not configured
+    - Not authorized
     - Request fails
     - Timeout occurs
     - Invalid response
@@ -43,15 +54,15 @@ def get_marketplace_data(query: str) -> dict:
             - avg_price: Average product price
             - price_range: (min_price, max_price)
             - top_sellers: Number of unique sellers
-            - avg_rating: Average seller rating (mock for now)
+            - avg_rating: Average seller rating (estimated)
             - sold_quantity: Total sold (estimated)
             - competition_level: 'low', 'medium', or 'high'
             - price_war_indicator: Boolean
             - source: 'mercado_livre_api' or 'mock_fallback'
             - error: Error message if fallback (optional)
     """
-    # Try real API first if configured
-    if is_configured():
+    # Try real API first if authorized
+    if is_authorized():
         try:
             api_data = _fetch_from_api(query)
             if api_data:
@@ -61,15 +72,13 @@ def get_marketplace_data(query: str) -> dict:
             print(f"[Mercado Livre API Error] {str(e)}")
 
     # Fallback to mock data
-    return _get_mock_data(query, fallback=True)
+    error_msg = "Not authorized - OAuth required" if is_configured() else "API not configured"
+    return _get_mock_data(query, fallback=True, error=error_msg)
 
 
 def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
     """
-    Fetches data from real Mercado Livre API.
-
-    Uses public search endpoint (no OAuth required for search):
-    GET https://api.mercadolibre.com/sites/MLB/search
+    Fetches data from real Mercado Livre API using OAuth token.
 
     Args:
         query: Search query
@@ -78,7 +87,14 @@ def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
     Returns:
         dict: Normalized marketplace data or None if failed
     """
-    # Mercado Livre public search API endpoint
+    # Get valid access token
+    access_token = ml_oauth.get_valid_token()
+
+    if not access_token:
+        print("[ML API] No valid access token")
+        return None
+
+    # Mercado Livre API search endpoint
     url = "https://api.mercadolibre.com/sites/MLB/search"
 
     params = {
@@ -86,13 +102,21 @@ def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
         'limit': limit
     }
 
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Accept': 'application/json'
+    }
+
     try:
         # Make request with timeout
-        response = requests.get(url, params=params, timeout=8)
+        response = requests.get(url, params=params, headers=headers, timeout=10)
 
         # Check status
         if response.status_code != 200:
             print(f"[ML API] Status {response.status_code}")
+            if response.status_code == 401:
+                # Token expired or invalid - force refresh
+                ml_oauth._refresh_access_token(ml_oauth.cache.get('ml_refresh_token', ''))
             return None
 
         # Parse JSON

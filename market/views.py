@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
 from .models import ProductSearch, MarketAnalysis
 from .services.analyzer import analyze_product
+from .services import ml_oauth, mercado_livre
 
 
 @require_http_methods(["GET", "POST"])
@@ -110,3 +112,71 @@ def _get_client_ip(request) -> str:
         ip = request.META.get('REMOTE_ADDR', '')
 
     return ip
+
+
+# OAuth Views
+
+def ml_authorize(request):
+    """
+    Redirects user to Mercado Livre OAuth authorization page.
+    """
+    if not mercado_livre.is_configured():
+        return HttpResponse("Mercado Livre API not configured", status=500)
+
+    # Get authorization URL
+    auth_url = ml_oauth.get_authorization_url()
+
+    # Redirect to ML authorization
+    return redirect(auth_url)
+
+
+def ml_callback(request):
+    """
+    Handles OAuth callback from Mercado Livre.
+    Exchanges authorization code for access token.
+    """
+    # Get authorization code from callback
+    code = request.GET.get('code')
+    error = request.GET.get('error')
+
+    if error:
+        return HttpResponse(f"OAuth error: {error}", status=400)
+
+    if not code:
+        return HttpResponse("No authorization code received", status=400)
+
+    # Exchange code for token
+    token_data = ml_oauth.exchange_code_for_token(code)
+
+    if token_data:
+        # Success! Redirect to test page
+        messages.success(request, "✅ Mercado Livre API autorizada com sucesso! Agora você pode usar dados reais.")
+        return redirect('market:test')
+    else:
+        return HttpResponse("Failed to exchange authorization code", status=500)
+
+
+def ml_status(request):
+    """
+    Shows Mercado Livre OAuth status.
+    """
+    configured = mercado_livre.is_configured()
+    authorized = mercado_livre.is_authorized()
+
+    html = f"""
+    <html>
+    <head><title>Mercado Livre API Status</title></head>
+    <body style="font-family: Arial; padding: 40px;">
+        <h1>Mercado Livre API Status</h1>
+
+        <p><strong>Configured:</strong> {'✅ Yes' if configured else '❌ No'}</p>
+        <p><strong>Authorized:</strong> {'✅ Yes' if authorized else '❌ No (OAuth required)'}</p>
+
+        {f'<p><a href="/market/mercadolivre/authorize/"><button style="padding: 10px 20px; font-size: 16px;">Authorize Mercado Livre</button></a></p>' if configured and not authorized else ''}
+
+        <p><a href="/market/test/">Go to Test Page</a></p>
+    </body>
+    </html>
+    """
+
+    return HttpResponse(html)
