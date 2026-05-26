@@ -765,13 +765,19 @@ section {
     box-shadow: 0 12px 30px rgba(239, 68, 68, 0.1);
 }
 
-.pain-card-conversion i {
+.pain-icon-wrapper {
+    margin-bottom: 1rem;
+}
+
+.pain-card-conversion i,
+.pain-icon-wrapper i {
     font-size: 2rem;
     color: var(--error);
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     display: block;
 }
 
+.pain-title-conversion,
 .pain-card-conversion h4 {
     font-size: 1.25rem;
     font-weight: 600;
@@ -779,6 +785,7 @@ section {
     color: var(--text-primary);
 }
 
+.pain-desc,
 .pain-card-conversion p {
     font-size: 1rem;
     color: var(--text-secondary);
@@ -1682,5 +1689,202 @@ svg defs {
     to {
         opacity: 1;
         transform: scale(1);
+    }
+}
+
+/* ===========================
+   HOW ANALYSIS WORKS SECTION - LANDING PAGE
+   =========================== */
+.how-works-section {
+    background: var(--bg-primary);
+    padding: var(--section-padding) 0;
+}
+
+.how-works-intro {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+}
+
+.how-works-card {
+    background: var(--bg-card);
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.35s ease;
+    height: 100%;
+    text-align: center;
+}
+
+.how-works-card:hover {
+    border-color: rgba(0, 212, 255, 0.3);
+    transform: translateY(-6px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.how-works-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 102, 255, 0.1));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+}
+
+.how-works-icon i {
+    font-size: 1.75rem;
+    color: var(--accent-cyan);
+}
+
+.how-works-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+}
+
+.how-works-card-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+    .how-works-section {
+        padding: var(--section-padding-mobile) 0;
+    }
+
+    .how-works-intro {
+        font-size: 1rem;
+    }
+
+    .how-works-card {
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 1rem;
+    }
+}
+
+/* ===========================
+   HOW ANALYSIS WORKS - CONFIRMATION PAGE
+   =========================== */
+.confirmation-how-works {
+    background: rgba(0, 212, 255, 0.03);
+    border: 1px solid rgba(0, 212, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2.5rem;
+    text-align: left;
+}
+
+.confirmation-section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.75rem;
+    text-align: center;
+}
+
+.explanation-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.explanation-block:last-of-type {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.explanation-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 102, 255, 0.1));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.explanation-icon i {
+    font-size: 1.5rem;
+    color: var(--accent-cyan);
+}
+
+.explanation-content {
+    flex: 1;
+}
+
+.explanation-title {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.explanation-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.final-note {
+    background: rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.15);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 2rem;
+}
+
+.final-note p {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.65;
+    font-style: italic;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .confirmation-how-works {
+        padding: 1.5rem;
+    }
+
+    .confirmation-section-title {
+        font-size: 1.25rem;
+    }
+
+    .explanation-block {
+        gap: 1rem;
+    }
+
+    .explanation-icon {
+        width: 45px;
+        height: 45px;
+    }
+
+    .explanation-icon i {
+        font-size: 1.25rem;
+    }
+
+    .explanation-title {
+        font-size: 1rem;
+    }
+
+    .explanation-text {
+        font-size: 0.875rem;
+    }
+
+    .final-note p {
+        font-size: 0.875rem;
     }
 }
