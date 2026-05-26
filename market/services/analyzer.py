@@ -156,11 +156,13 @@ def _generate_summary(query: str, classification: str, final_score: float,
     else:  # bad
         opening = f"✗ {query.title()} não é recomendado no momento."
 
-    # Add trend analysis
-    if trend_direction == 'rising':
+    # Add trend analysis (support both Google Trends and legacy formats)
+    if trend_direction in ('rising', 'upward'):
         trend_text = f"O interesse de busca está crescendo ({growth_30d:+.1f}% em 30 dias)"
-    elif trend_direction == 'falling':
+    elif trend_direction in ('falling', 'downward'):
         trend_text = f"O interesse de busca está em queda ({growth_30d:+.1f}% em 30 dias)"
+    elif trend_direction == 'volatile':
+        trend_text = f"O interesse de busca está volátil (variação de {growth_30d:+.1f}% em 30 dias)"
     else:
         trend_text = "O interesse de busca está estável"
 
@@ -200,8 +202,10 @@ def _calculate_confidence(marketplace_data: dict, trends_data: dict) -> int:
     """
     Calculates confidence level of the analysis (0-100%).
 
+    NOW USES REAL GOOGLE TRENDS CONFIDENCE!
+
     Based on data quality and consistency.
-    In mock mode, returns simulated confidence.
+    Uses Google Trends confidence when available, falls back to heuristics.
 
     Args:
         marketplace_data: Marketplace data
@@ -210,23 +214,38 @@ def _calculate_confidence(marketplace_data: dict, trends_data: dict) -> int:
     Returns:
         int: Confidence percentage (0-100)
     """
-    # In production, this would analyze:
-    # - Data freshness
-    # - Sample size
-    # - Data consistency
-    # - Provider reliability
+    # Use real Google Trends confidence if available
+    if trends_data.get('source') == 'google_trends' and 'confidence' in trends_data:
+        # Google Trends provides confidence as 0-1 float
+        trends_confidence = int(trends_data['confidence'] * 100)
 
-    base_confidence = 70  # Mock data has moderate confidence
+        # Blend with marketplace data quality
+        marketplace_factor = 50  # Base marketplace confidence
 
-    # Adjust based on interest level (higher interest = more reliable data)
-    if trends_data['current_interest'] > 50:
-        base_confidence += 10
+        # Adjust based on number of listings (more listings = more data)
+        if marketplace_data['total_listings'] > 500:
+            marketplace_factor = 70
+        elif marketplace_data['total_listings'] > 200:
+            marketplace_factor = 60
 
-    # Adjust based on number of listings (more listings = more data)
-    if marketplace_data['total_listings'] > 500:
-        base_confidence += 10
+        # Weighted average: 70% trends confidence, 30% marketplace
+        combined_confidence = int(trends_confidence * 0.70 + marketplace_factor * 0.30)
 
-    return min(95, base_confidence)  # Cap at 95% for mock data
+        return min(95, combined_confidence)
+
+    else:
+        # Fallback: heuristic-based confidence (mock data)
+        base_confidence = 70
+
+        # Adjust based on interest level (higher interest = more reliable data)
+        if trends_data['current_interest'] > 50:
+            base_confidence += 10
+
+        # Adjust based on number of listings (more listings = more data)
+        if marketplace_data['total_listings'] > 500:
+            base_confidence += 10
+
+        return min(95, base_confidence)  # Cap at 95% for mock data
 
 
 def _get_locked_fields() -> list:

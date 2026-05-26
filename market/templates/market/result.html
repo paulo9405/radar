@@ -180,8 +180,8 @@
             {% else %}
                 <span class="source-badge source-mock">⚠ Mercado Livre (Mock)</span>
             {% endif %}
-            {% if analysis.data_sources.trends == 'google_trends_api' %}
-                <span class="source-badge source-api">✓ Google Trends API</span>
+            {% if analysis.data_sources.trends == 'google_trends' %}
+                <span class="source-badge source-api">📈 Google Trends LIVE</span>
             {% else %}
                 <span class="source-badge source-mock">⚠ Google Trends (Mock)</span>
             {% endif %}
@@ -223,6 +223,78 @@
                 {{ analysis.summary }}
             </div>
         </div>
+
+        {% if analysis.data_sources.trends == 'google_trends' %}
+        <div class="score-card">
+            <h3>📈 Insights do Google Trends (Dados Reais)</h3>
+
+            <div class="individual-scores">
+                <div class="score-item">
+                    <div class="label">🎯 Direção da Tendência</div>
+                    <div class="value" style="font-size: 1.3rem;">
+                        {% if analysis.raw_data.trends.trend_direction == 'upward' %}
+                            ↗️ Crescendo
+                        {% elif analysis.raw_data.trends.trend_direction == 'downward' %}
+                            ↘️ Em Queda
+                        {% elif analysis.raw_data.trends.trend_direction == 'volatile' %}
+                            ⚡ Volátil
+                        {% else %}
+                            → Estável
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="score-item">
+                    <div class="label">🚀 Momentum</div>
+                    <div class="value">{{ analysis.raw_data.trends.momentum_score|floatformat:1 }}/10</div>
+                </div>
+
+                <div class="score-item">
+                    <div class="label">📊 Interesse Atual</div>
+                    <div class="value">{{ analysis.raw_data.trends.current_interest }}/100</div>
+                </div>
+
+                <div class="score-item">
+                    <div class="label">📈 Crescimento 30d</div>
+                    <div class="value" style="font-size: 1.5rem;">
+                        {% if analysis.raw_data.trends.growth_30d > 0 %}
+                            <span style="color: #28a745;">+{{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</span>
+                        {% elif analysis.raw_data.trends.growth_30d < 0 %}
+                            <span style="color: #dc3545;">{{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</span>
+                        {% else %}
+                            <span style="color: #6c757d;">{{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if analysis.raw_data.trends.related_queries %}
+            <div style="margin-top: 20px;">
+                <h5 style="color: #667eea; margin-bottom: 10px;">🔍 Buscas Relacionadas</h5>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    {% for query in analysis.raw_data.trends.related_queries|slice:":5" %}
+                        <span style="background: #e7f3ff; color: #007bff; padding: 5px 12px; border-radius: 15px; font-size: 0.85rem;">
+                            {{ query }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if analysis.raw_data.trends.top_regions %}
+            <div style="margin-top: 20px;">
+                <h5 style="color: #667eea; margin-bottom: 10px;">🌎 Top Regiões</h5>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    {% for region in analysis.raw_data.trends.top_regions|slice:":4" %}
+                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
+                            <strong>{{ region.region }}</strong>: {{ region.interest }}/100
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
 
         {% if analysis.locked_fields %}
         <div class="locked-features">

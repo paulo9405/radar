@@ -15,10 +15,12 @@ def calculate_demand_score(trends_data: dict) -> float:
     """
     Calculates demand score based on Google Trends data.
 
+    NOW USES REAL GOOGLE TRENDS SIGNALS!
+
     Factors:
-    - Current interest level (40%)
-    - 30-day growth (35%)
-    - 90-day growth (25%)
+    - Current interest level (30%) - baseline demand
+    - Momentum score (50%) - captures growth acceleration
+    - Stability score (20%) - confidence in trend
 
     Args:
         trends_data: Dictionary from google_trends.get_trends_data()
@@ -27,23 +29,40 @@ def calculate_demand_score(trends_data: dict) -> float:
         float: Demand score (0-10)
     """
     current_interest = trends_data['current_interest']
-    growth_30d = trends_data['growth_30d']
-    growth_90d = trends_data['growth_90d']
 
-    # Normalize current interest (0-100 -> 0-10)
-    interest_score = current_interest / 10
+    # Use momentum_score if available (from real Google Trends)
+    # Otherwise fall back to growth-based calculation (from mock data)
+    if 'momentum_score' in trends_data and trends_data.get('source') == 'google_trends':
+        momentum_score = trends_data['momentum_score']
+        stability_score = trends_data.get('stability_score', 5.0)
 
-    # Normalize growth rates
-    # Positive growth is good, negative is bad
-    growth_30d_score = _normalize_growth(growth_30d)
-    growth_90d_score = _normalize_growth(growth_90d)
+        # Normalize current interest (0-100 -> 0-10)
+        interest_score = current_interest / 10
 
-    # Weighted average
-    demand_score = (
-        interest_score * 0.40 +
-        growth_30d_score * 0.35 +
-        growth_90d_score * 0.25
-    )
+        # Weighted average using real signals
+        demand_score = (
+            interest_score * 0.30 +
+            momentum_score * 0.50 +
+            stability_score * 0.20
+        )
+    else:
+        # Fallback to growth-based calculation (mock data)
+        growth_30d = trends_data['growth_30d']
+        growth_90d = trends_data['growth_90d']
+
+        # Normalize current interest (0-100 -> 0-10)
+        interest_score = current_interest / 10
+
+        # Normalize growth rates
+        growth_30d_score = _normalize_growth(growth_30d)
+        growth_90d_score = _normalize_growth(growth_90d)
+
+        # Weighted average (legacy formula)
+        demand_score = (
+            interest_score * 0.40 +
+            growth_30d_score * 0.35 +
+            growth_90d_score * 0.25
+        )
 
     return round(min(10.0, max(0.0, demand_score)), 1)
 
@@ -101,10 +120,13 @@ def calculate_saturation_score(marketplace_data: dict, trends_data: dict) -> flo
 
     Lower saturation = higher score (better opportunity)
 
+    NOW USES REAL GOOGLE TRENDS SIGNALS!
+
     Factors:
     - Price war indicator (40%)
-    - Listings vs demand ratio (35%)
-    - Trend direction (25%)
+    - Listings vs demand ratio (30%)
+    - Trend direction (20%)
+    - Volatility penalty (10%) - unstable markets are riskier
 
     Args:
         marketplace_data: Dictionary from mercado_livre.get_marketplace_data()
@@ -138,19 +160,36 @@ def calculate_saturation_score(marketplace_data: dict, trends_data: dict) -> flo
     else:
         ratio_score = 1.0
 
+    # Normalize trend direction (support both old and new formats)
+    normalized_direction = _normalize_trend_direction(trend_direction)
+
     # Trend direction affects saturation
     trend_scores = {
-        'rising': 8.0,   # Growing market, less saturated
-        'stable': 5.0,   # Stable market
-        'falling': 2.0,  # Declining market, likely saturated
+        'rising': 8.0,     # Growing market, less saturated
+        'stable': 5.0,     # Stable market
+        'falling': 2.0,    # Declining market, likely saturated
+        'volatile': 3.0,   # Unpredictable market, risky
     }
-    trend_score = trend_scores.get(trend_direction, 5.0)
+    trend_score = trend_scores.get(normalized_direction, 5.0)
+
+    # Volatility penalty (if available from real Google Trends)
+    volatility_score = 10.0  # Default: no penalty
+    if 'volatility' in trends_data and trends_data.get('source') == 'google_trends':
+        volatility = trends_data['volatility']
+        # High volatility (>40) = risky/saturated market
+        if volatility > 40:
+            volatility_score = 4.0
+        elif volatility > 25:
+            volatility_score = 7.0
+        else:
+            volatility_score = 10.0
 
     # Weighted average
     saturation_score = (
         price_war_score * 0.40 +
-        ratio_score * 0.35 +
-        trend_score * 0.25
+        ratio_score * 0.30 +
+        trend_score * 0.20 +
+        volatility_score * 0.10
     )
 
     return round(min(10.0, max(0.0, saturation_score)), 1)
@@ -276,3 +315,30 @@ def _normalize_growth(growth_percentage: float) -> float:
     else:
         # Negative growth
         return max(0.0, 5.0 + (growth_percentage / 50) * 5.0)
+
+
+def _normalize_trend_direction(direction: str) -> str:
+    """
+    Normalizes trend direction to standard format.
+
+    Maps Google Trends format to legacy format:
+    - 'upward' -> 'rising'
+    - 'downward' -> 'falling'
+    - 'stable' -> 'stable'
+    - 'volatile' -> 'volatile'
+
+    Args:
+        direction: Trend direction from Google Trends
+
+    Returns:
+        str: Normalized direction
+    """
+    direction_map = {
+        'upward': 'rising',
+        'downward': 'falling',
+        'stable': 'stable',
+        'volatile': 'volatile',
+        'rising': 'rising',   # Support legacy format
+        'falling': 'falling',  # Support legacy format
+    }
+    return direction_map.get(direction, 'stable')

@@ -16,3 +16,6 @@ python-decouple==3.8
 
 # HTTP requests for API integration
 requests==2.31.0
+
+# Google Trends data provider
+pytrends==4.9.2
