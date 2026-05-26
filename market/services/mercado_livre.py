@@ -38,12 +38,8 @@ def get_marketplace_data(query: str) -> dict:
     """
     Fetches marketplace data for a given product query.
 
-    Uses real Mercado Livre API with OAuth if authorized.
-    Falls back to deterministic mock data if:
-    - Not authorized
-    - Request fails
-    - Timeout occurs
-    - Invalid response
+    Uses public Mercado Livre search API (no authentication required).
+    Falls back to deterministic mock data if request fails.
 
     Args:
         query: Product search query
@@ -61,24 +57,22 @@ def get_marketplace_data(query: str) -> dict:
             - source: 'mercado_livre_api' or 'mock_fallback'
             - error: Error message if fallback (optional)
     """
-    # Try real API first if authorized
-    if is_authorized():
-        try:
-            api_data = _fetch_from_api(query)
-            if api_data:
-                return api_data
-        except Exception as e:
-            # Log error but don't crash - fall back to mock
-            print(f"[Mercado Livre API Error] {str(e)}")
+    # Use public search endpoint (no auth required)
+    try:
+        api_data = _fetch_from_public_api(query)
+        if api_data:
+            return api_data
+    except Exception as e:
+        # Log error but don't crash - fall back to mock
+        print(f"[ML API] Exception: {str(e)}")
 
     # Fallback to mock data
-    error_msg = "Not authorized - OAuth required" if is_configured() else "API not configured"
-    return _get_mock_data(query, fallback=True, error=error_msg)
+    return _get_mock_data(query, fallback=True, error="API request failed")
 
 
-def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
+def _fetch_from_public_api(query: str, limit: int = 50) -> Optional[dict]:
     """
-    Fetches data from real Mercado Livre API using OAuth token.
+    Fetches data from public Mercado Livre API (no authentication required).
 
     Args:
         query: Search query
@@ -87,14 +81,7 @@ def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
     Returns:
         dict: Normalized marketplace data or None if failed
     """
-    # Get valid access token
-    access_token = ml_oauth.get_valid_token()
-
-    if not access_token:
-        print("[ML API] No valid access token")
-        return None
-
-    # Mercado Livre API search endpoint
+    # Public Mercado Livre API search endpoint
     url = "https://api.mercadolibre.com/sites/MLB/search"
 
     params = {
@@ -103,36 +90,46 @@ def _fetch_from_api(query: str, limit: int = 50) -> Optional[dict]:
     }
 
     headers = {
-        'Authorization': f'Bearer {access_token}',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'User-Agent': 'RadarTendencias/1.0'
     }
+
+    print(f"[ML API] Public search request: q={query}, limit={limit}")
 
     try:
         # Make request with timeout
         response = requests.get(url, params=params, headers=headers, timeout=10)
 
+        # Log status
+        print(f"[ML API] Status: {response.status_code}")
+
         # Check status
         if response.status_code != 200:
-            print(f"[ML API] Status {response.status_code}")
-            if response.status_code == 401:
-                # Token expired or invalid - force refresh
-                ml_oauth._refresh_access_token(ml_oauth.cache.get('ml_refresh_token', ''))
+            # Log failure details
+            body_preview = response.text[:300] if response.text else "empty"
+            print(f"[ML API] Public search failed: status={response.status_code}")
+            print(f"[ML API] Response preview: {body_preview}")
             return None
 
         # Parse JSON
         data = response.json()
 
+        # Log success
+        results_count = len(data.get('results', []))
+        total_results = data.get('paging', {}).get('total', 0)
+        print(f"[ML API] ✅ Results found: {results_count} items, {total_results} total")
+
         # Normalize and return
         return _normalize_api_response(data, query)
 
     except requests.exceptions.Timeout:
-        print("[ML API] Request timeout")
+        print("[ML API] ❌ Request timeout")
         return None
     except requests.exceptions.RequestException as e:
-        print(f"[ML API] Request error: {e}")
+        print(f"[ML API] ❌ Request error: {e}")
         return None
     except (KeyError, ValueError) as e:
-        print(f"[ML API] Parse error: {e}")
+        print(f"[ML API] ❌ Parse error: {e}")
         return None
 
 

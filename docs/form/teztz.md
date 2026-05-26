@@ -1,166 +1,118 @@
+---
+  O Que Foi Feito
 
-● Perfect! The MVP foundation of the market app has been successfully implemented. Here's the complete summary:
+  1. Novo Model: MercadoLivreToken (market/models.py)
 
-  Implementation Complete
+  class MercadoLivreToken(models.Model):
+      access_token = models.TextField()
+      refresh_token = models.TextField()
+      expires_at = models.DateTimeField()
+      # ... outros campos
 
-  Files Created
+  Features:
+  - ✅ Singleton pattern (apenas 1 registro, id=1)
+  - ✅ Método is_expired() - checa se token expirou
+  - ✅ Método get_current() - carrega token do banco
+  - ✅ Método save_token_data() - salva/atualiza token
+  - ✅ Máscaras de segurança para display no admin
 
-  Market App Structure:
-  market/
-  ├── admin.py                 (Django admin configuration)
-  ├── apps.py                  (App configuration)
-  ├── models.py                (ProductSearch & MarketAnalysis models)
-  ├── views.py                 (View with form validation)
-  ├── urls.py                  (URL routing)
-  ├── services/
-  │   ├── __init__.py
-  │   ├── analyzer.py          (Main orchestrator with basic/premium modes)
-  │   ├── scoring.py           (Scoring engine with roadmap formula)
-  │   ├── mercado_livre.py     (Mock Mercado Livre provider)
-  │   └── google_trends.py     (Mock Google Trends provider)
-  └── templates/market/
-      ├── test.html            (Search form page)
-      └── result.html          (Analysis results page)
+  2. Atualizado ml_oauth.py
 
-  Migrations:
-  - market/migrations/0001_initial.py (ProductSearch and MarketAnalysis tables)
+  - ❌ Removido: Cache para access_token e refresh_token
+  - ✅ Adicionado: Salva tokens no banco de dados
+  - ✅ Refresh automático: Quando token expira, refresh e salva no banco
+  - ✅ Logs seguros: Nunca loga tokens completos
 
-  Files Modified
+  3. Django Admin Configurado
 
-  1. radar_project/settings.py - Added 'market' to INSTALLED_APPS
-  2. radar_project/urls.py - Added path('market/', include('market.urls'))
+  - ✅ Tokens mascarados por segurança (mostra apenas APP_US...x7Gf)
+  - ✅ Status visual: 🟢 Valid / 🔴 Expired
+  - ✅ Campos sensíveis ocultos do formulário
+  - ✅ Previne criação manual (apenas via OAuth)
 
-  Database Models
+  4. Redis Completamente Removido
 
-  ProductSearch:
-  - query (max 100 chars, indexed)
-  - created_at (auto-generated, indexed)
-  - source (landing/dashboard/api)
-  - is_public_test (boolean)
-  - ip_address (optional)
-  - user (optional, prepared for future auth)
+  - ❌ Removido django-redis==5.4.0
+  - ❌ Removido redis==5.0.1
+  - ❌ Removido hiredis==2.2.3
+  - ✅ Cache simplificado para LocMemCache (apenas PKCE temporário)
 
-  MarketAnalysis:
-  - product_search (OneToOne relationship)
-  - demand_score, competition_score, saturation_score, price_score (0-10)
-  - final_score (weighted average, indexed)
-  - classification (bad/risky/good/excellent)
-  - confidence_level (0-100%)
-  - summary (AI-generated text)
-  - raw_data (JSON field with provider data)
-  - created_at (auto-generated)
+  5. Migrations Criadas
 
-  Scoring Formula (from Roadmap)
+  - ✅ market/migrations/0002_mercadolivretoken.py
+  - ✅ Testado localmente com sucesso
+  - ✅ Render vai executar automaticamente no deploy
 
-  - Demand (Tendência): 35%
-  - Competition (Concorrência): 30%
-  - Saturation (Saturação): 20%
-  - Price/Margin (Preço): 15%
+  ---
+  Como Funciona Agora
 
-  Classification Ranges
+  1. OAuth Authorization:
+  Usuário → /market/mercadolivre/authorize/
+         → Mercado Livre
+         → /market/mercadolivre/callback/
+         → Token salvo no PostgreSQL ✅
 
-  - 0-3: Produto ruim
-  - 4-6: Arriscado
-  - 7-8: Boa oportunidade
-  - 9-10: Alta oportunidade
+  2. Uso do Token:
+  # Carrega do banco de dados
+  token = MercadoLivreToken.get_current()
 
-  Features Implemented
+  # Checa se expirou
+  if token.is_expired():
+      # Refresh automático e salva no banco
+      new_token = refresh_token()
 
-  Form Validation:
-  - Required field
-  - Trim whitespace
-  - Minimum 2 characters
-  - Maximum 100 characters
-  - Clear error messages
+  3. Persistência:
+  - ✅ Token sobrevive a reloads de página
+  - ✅ Token sobrevive a restart de workers
+  - ✅ Token sobrevive a deploys
+  - ✅ Token compartilhado entre todos os workers
 
-  Analysis Modes:
-  - basic (free) - Shows scores and summary, locks premium features
-  - premium (paid) - Full access to detailed data (prepared for future)
+  ---
+  O Que Acontece Agora
 
-  Mock Data:
-  - Deterministic (same product = same results)
-  - Based on query hash for consistency
-  - Fully separated providers (easy to replace with real APIs)
+  Render está deployando:
+  1. Instalando dependências (sem Redis)
+  2. Executando migration 0002_mercadolivretoken
+  3. Reiniciando workers
 
-  Admin Panel:
-  - ProductSearch admin with filters and search
-  - MarketAnalysis admin (read-only, auto-generated)
-  - Custom list displays and methods
+  Após deployment (2-3 minutos):
+  1. Site volta a funcionar normalmente
+  2. Vá para /market/mercadolivre/authorize/
+  3. Complete OAuth flow
+  4. Token será salvo no PostgreSQL
+  5. Badge mostrará 🟢 VERDE "✓ Mercado Livre API"
+  6. Badge permanecerá verde em todas as requests subsequentes!
 
-  Commands Executed
+  ---
+  Teste Após Deployment
 
-  python manage.py startapp market
-  python manage.py makemigrations
-  python manage.py migrate
-  python manage.py check
+  Passo 1: Re-autorize OAuth
+  https://radar-1llq.onrender.com/market/mercadolivre/authorize/
 
-  All commands executed successfully with no errors.
+  Passo 2: Faça uma busca
+  https://radar-1llq.onrender.com/market/test/
 
-  How to Test
+  Passo 3: Verifique o Admin
+  https://radar-1llq.onrender.com/admin/market/mercadolivretoken/
 
-  1. Start the development server:
-  python manage.py runserver
-  2. Access the test page:
-  http://127.0.0.1:8000/market/test/
-  3. Try these example products:
-    - "Luminária Sunset"
-    - "Mini impressora térmica"
-    - "Projetor portátil"
-    - "Organizador de mesa"
-  4. Expected behavior:
-    - Enter a product name
-    - Receive analysis with:
-        - Final score (0-10)
-      - Classification (Produto ruim → Alta oportunidade)
-      - Individual scores for demand, competition, saturation, price
-      - AI-generated summary
-      - Locked premium features
-      - CTA for premium upgrade
-  5. Verify in Django Admin:
-  http://127.0.0.1:8000/admin/
-    - Check Market > Product Searches
-    - Check Market > Market Analyses
+  Você verá:
+  - 🟢 Status: Valid
+  - Token mascarado: APP_US...x7Gf
+  - Expires at: (data/hora)
+  - Updated at: (timestamp)
 
-  Key Technical Highlights
-
-  Service Abstraction:
-  - Each data provider is isolated in its own file
-  - Easy to replace mock data with real API calls
-  - TODO comments mark integration points
-
-  Deterministic Mock Data:
-  - Uses MD5 hash of query for consistency
-  - Same product always returns same scores
-  - Realistic data ranges
-
-  Prepared for Future:
-  - User authentication (foreign key ready)
-  - Premium mode structure complete
-  - Locked features list prepared
-  - IP tracking for rate limiting
-
-  No Breaking Changes:
-  - Landing app untouched
-  - Only added new routes
-  - Completely isolated functionality
-
-  Next Steps (Future Phases)
-
-  According to the roadmap:
-
-  Week 2:
-  - Replace mock data with real Mercado Livre API
-  - Integrate Google Trends (pytrends)
-  - Refine scoring algorithm with real data
-
-  Week 3:
-  - Build dashboard
-  - Add search history
-  - User authentication
-
-  Week 4:
-  - Polish UI/UX
-  - Deploy updates
-  - Collect user feedback
-
-  The foundation is now complete and ready for real API integrations!
+  ---
+  Benefícios da Nova Arquitetura
+  ┌───────────────────────────────────┬─────────────────────────────────────┐
+  │           Antes (Cache)           │          Agora (Database)           │
+  ├───────────────────────────────────┼─────────────────────────────────────┤
+  │ ❌ Tokens perdidos entre requests │ ✅ Tokens persistem permanentemente │
+  ├───────────────────────────────────┼─────────────────────────────────────┤
+  │ ❌ Redis causava erro 500         │ ✅ Sem dependência de Redis         │
+  ├───────────────────────────────────┼─────────────────────────────────────┤
+  │ ❌ Badge sempre amarelo           │ ✅ Badge verde após OAuth           │
+  ├───────────────────────────────────┼─────────────────────────────────────┤
+  │ ❌ Dados mock sempre              │ ✅ Dados reais da API               │
+  ├───────────────────────────────────┼─────────────────────────────────────┤
+  │ ❌ Cache complexo                 │ ✅ Simple & clean                   │
+  └───────────────────────────────────┴─────────────────────────────────────┘
