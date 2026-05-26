@@ -368,6 +368,94 @@
         </div>
         {% endif %}
 
+        <!-- Feedback Section -->
+        {% if whatsapp_lead %}
+        <div class="score-card" id="feedback-section">
+            <h3 style="margin-bottom: 20px;">💬 O que você achou desta análise?</h3>
+            <p class="text-muted" style="margin-bottom: 20px;">
+                Sua opinião ajuda a melhorar o produto. Leva só 10 segundos!
+            </p>
+
+            <form id="feedback-form">
+                {% csrf_token %}
+                <input type="hidden" name="whatsapp_lead_id" value="{{ whatsapp_lead.id }}">
+                <input type="hidden" name="product_query" value="{{ query }}">
+                <input type="hidden" name="rating" id="rating-input">
+
+                <!-- Rating Buttons -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <button type="button" class="rating-btn" data-rating="very_useful">
+                        ⭐ Muito útil
+                    </button>
+                    <button type="button" class="rating-btn" data-rating="interesting">
+                        👍 Interessante
+                    </button>
+                    <button type="button" class="rating-btn" data-rating="confusing">
+                        🤔 Confuso
+                    </button>
+                    <button type="button" class="rating-btn" data-rating="not_trust">
+                        😕 Não confiaria
+                    </button>
+                    <button type="button" class="rating-btn" data-rating="would_use_again">
+                        🔥 Usaria novamente
+                    </button>
+                </div>
+
+                <!-- Optional Comments -->
+                <div style="margin-bottom: 20px;">
+                    <label for="comments" style="font-weight: 600; margin-bottom: 8px; display: block; color: #333;">
+                        Quer deixar um comentário? (opcional)
+                    </label>
+                    <textarea
+                        name="comments"
+                        id="comments"
+                        rows="3"
+                        class="form-control"
+                        placeholder="O que funcionou bem? O que pode melhorar?"
+                        style="border-radius: 10px; border: 1px solid #dee2e6;"
+                    ></textarea>
+                </div>
+
+                <!-- Would Pay Checkbox -->
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <input type="checkbox" name="would_pay" style="margin-right: 10px; width: 20px; height: 20px;">
+                        <span style="font-weight: 600; color: #333;">
+                            💳 Eu pagaria por acesso ilimitado a análises assim
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary w-100" id="submit-feedback-btn" style="padding: 15px; border-radius: 10px; font-weight: 600; font-size: 1.1rem;" disabled>
+                    Enviar Feedback
+                </button>
+
+                <!-- Success Message (hidden initially) -->
+                <div id="feedback-success" style="display: none; background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
+                    <h4 style="margin: 0 0 10px 0;">✅ Obrigado pelo feedback!</h4>
+                    <p style="margin: 0;">Sua opinião é muito importante para nós.</p>
+                </div>
+
+                <!-- Error Message (hidden initially) -->
+                <div id="feedback-error" style="display: none; background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                    Erro ao enviar feedback. Tente novamente.
+                </div>
+            </form>
+
+            <!-- Final CTA (shown after feedback) -->
+            <div id="final-cta" style="display: none; margin-top: 30px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; text-align: center; color: white;">
+                <h3 style="margin-bottom: 15px; color: white;">🚀 Quer acesso ilimitado quando lançarmos?</h3>
+                <p style="margin-bottom: 20px; opacity: 0.9;">
+                    Entre na lista de espera e seja um dos primeiros a ter acesso completo
+                </p>
+                <a href="/" class="btn btn-unlock" style="background: white; color: #667eea; text-decoration: none; display: inline-block;">
+                    Entrar na Lista de Espera
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="text-center">
             <a href="{% url 'market:test' %}" class="btn-new-search">
                 ← Nova Análise
@@ -376,5 +464,113 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Feedback form handling
+        const ratingButtons = document.querySelectorAll('.rating-btn');
+        const ratingInput = document.getElementById('rating-input');
+        const submitBtn = document.getElementById('submit-feedback-btn');
+        const feedbackForm = document.getElementById('feedback-form');
+        const feedbackSuccess = document.getElementById('feedback-success');
+        const feedbackError = document.getElementById('feedback-error');
+        const finalCta = document.getElementById('final-cta');
+
+        // Rating button styles
+        const ratingBtnStyle = `
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        `;
+
+        const ratingBtnActiveStyle = `
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+            transform: scale(1.05);
+        `;
+
+        ratingButtons.forEach(btn => {
+            btn.style.cssText = ratingBtnStyle;
+
+            btn.addEventListener('click', function() {
+                // Remove active state from all buttons
+                ratingButtons.forEach(b => {
+                    b.style.cssText = ratingBtnStyle;
+                });
+
+                // Add active state to clicked button
+                this.style.cssText = ratingBtnStyle + ratingBtnActiveStyle;
+
+                // Set rating value
+                ratingInput.value = this.dataset.rating;
+
+                // Enable submit button
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+            });
+
+            btn.addEventListener('mouseenter', function() {
+                if (this.style.color !== 'white') {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.borderColor = '#667eea';
+                }
+            });
+
+            btn.addEventListener('mouseleave', function() {
+                if (this.style.color !== 'white') {
+                    this.style.transform = 'scale(1)';
+                    this.style.borderColor = '#dee2e6';
+                }
+            });
+        });
+
+        // Form submission
+        feedbackForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            const formData = new FormData(feedbackForm);
+
+            try {
+                const response = await fetch('{% url "market:submit_feedback" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Hide form
+                    feedbackForm.style.display = 'none';
+
+                    // Show success message
+                    feedbackSuccess.style.display = 'block';
+
+                    // Show final CTA after 1 second
+                    setTimeout(() => {
+                        finalCta.style.display = 'block';
+                    }, 1000);
+                } else {
+                    feedbackError.style.display = 'block';
+                    feedbackError.textContent = data.error || 'Erro ao enviar feedback';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Enviar Feedback';
+                }
+            } catch (error) {
+                feedbackError.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Feedback';
+            }
+        });
+    </script>
 </body>
 </html>

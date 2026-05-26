@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import ProductSearch, MarketAnalysis
 from .services.analyzer import analyze_product
 from .services import ml_oauth, mercado_livre
+from landing.models import WhatsAppLead, AnalysisFeedback
 
 
 @require_http_methods(["GET", "POST"])
@@ -24,6 +25,21 @@ def test_analysis(request):
         if error:
             messages.error(request, error)
             return render(request, 'market/test.html', {'query': query})
+
+        # Check if user has free test available
+        whatsapp_lead_id = request.session.get('whatsapp_lead_id')
+        has_free_test = request.session.get('has_free_test', False)
+
+        whatsapp_lead = None
+        if whatsapp_lead_id and has_free_test:
+            try:
+                whatsapp_lead = WhatsAppLead.objects.get(id=whatsapp_lead_id)
+                # Mark free test as used
+                whatsapp_lead.mark_test_as_used(query)
+                # Clear session flag
+                request.session['has_free_test'] = False
+            except WhatsAppLead.DoesNotExist:
+                pass
 
         # Get client IP (for tracking public tests)
         ip_address = _get_client_ip(request)
@@ -57,13 +73,60 @@ def test_analysis(request):
         context = {
             'query': query,
             'analysis': analysis_result,
-            'search_id': product_search.id
+            'search_id': product_search.id,
+            'whatsapp_lead': whatsapp_lead,  # For feedback form
         }
 
         return render(request, 'market/result.html', context)
 
     # GET request - show form
     return render(request, 'market/test.html')
+
+
+@require_http_methods(["POST"])
+def submit_feedback(request):
+    """
+    Handles feedback submission after analysis.
+    """
+    try:
+        # Get form data
+        whatsapp_lead_id = request.POST.get('whatsapp_lead_id')
+        product_query = request.POST.get('product_query', '')
+        rating = request.POST.get('rating')
+        comments = request.POST.get('comments', '').strip()
+        would_pay = request.POST.get('would_pay') == 'on'
+
+        # Validation
+        if not rating or rating not in dict(AnalysisFeedback.RATING_CHOICES):
+            return JsonResponse({'success': False, 'error': 'Rating inválido'}, status=400)
+
+        # Get WhatsAppLead if provided
+        whatsapp_lead = None
+        if whatsapp_lead_id:
+            try:
+                whatsapp_lead = WhatsAppLead.objects.get(id=whatsapp_lead_id)
+                whatsapp_lead.submitted_feedback = True
+                whatsapp_lead.save()
+            except WhatsAppLead.DoesNotExist:
+                pass
+
+        # Create feedback
+        AnalysisFeedback.objects.create(
+            whatsapp_lead=whatsapp_lead,
+            product_query=product_query,
+            rating=rating,
+            comments=comments,
+            would_pay=would_pay,
+            ip_address=_get_client_ip(request)
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Obrigado pelo feedback! Sua opinião é muito importante.'
+        })
+
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 
 def _validate_query(query: str) -> str:

@@ -34,21 +34,18 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 hero-content">
-                    <!-- HEADLINE VERSION 1 (default) - test other versions with A/B testing -->
-                    <h1 class="hero-title-conversion">Descubra se um produto ainda vale a pena vender</h1>
-                    <!-- VERSION 2: A maioria dos vendedores descobre a saturação tarde demais -->
-                    <!-- VERSION 3: Veja demanda e concorrência antes de investir -->
+                    <h1 class="hero-title-conversion">Pare de comprar produtos saturados</h1>
 
-                    <p class="hero-subtitle-conversion">Veja se o produto ainda vende antes de comprar estoque.</p>
+                    <p class="hero-subtitle-conversion">Veja se o produto ainda vende antes de comprar estoque. Análise grátis em segundos.</p>
 
                     <div class="hero-trust-signals">
                         <div class="trust-item">
-                            <i class="bi bi-clock-fill"></i>
-                            <span>Vagas limitadas</span>
+                            <i class="bi bi-graph-up-arrow"></i>
+                            <span>Baseado em dados do Google Trends</span>
                         </div>
                         <div class="trust-item">
-                            <i class="bi bi-people-fill"></i>
-                            <span>Primeiros da fila ganham acesso</span>
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            <span>Resultado instantâneo</span>
                         </div>
                     </div>
                 </div>
@@ -58,6 +55,10 @@
                             <span class="mockup-label">
                                 <span class="scanning-indicator"></span>
                                 Exemplo de Análise
+                            </span>
+                            <span class="mockup-badge">
+                                <i class="bi bi-check-circle-fill"></i>
+                                Dados reais do Google Trends
                             </span>
                         </div>
                         <div class="mockup-body">
@@ -121,12 +122,12 @@
                 <div class="col-lg-5">
                     <div class="form-header-conversion text-center">
                         <div class="form-badge-conversion">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                            Vagas Limitadas
+                            <i class="bi bi-gift-fill"></i>
+                            Análise Grátis
                         </div>
-                        <h2 class="form-title-conversion">Cadastre seu WhatsApp</h2>
+                        <h2 class="form-title-conversion">Digite seu WhatsApp para liberar análise grátis</h2>
                         <p class="form-subtitle-conversion">
-                            Quem entrar agora recebe acesso primeiro.
+                            Descubra agora se um produto vale a pena. Sem cadastro, sem espera.
                         </p>
                     </div>
 
@@ -149,7 +150,7 @@
                             <div class="mb-4">
                                 <label for="{{ form.whatsapp.id_for_label }}" class="form-label">Seu WhatsApp</label>
                                 {{ form.whatsapp }}
-                                <small class="form-text">Enviaremos o acesso aqui</small>
+                                <small class="form-text">Para liberar a análise grátis</small>
                                 {% if form.whatsapp.errors %}
                                     <div class="invalid-feedback d-block">
                                         {{ form.whatsapp.errors }}
@@ -158,7 +159,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-lg w-100 submit-button-conversion">
-                                <span class="button-text">Quero acesso antecipado</span>
+                                <span class="button-text">Fazer 1 Análise Grátis</span>
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </button>
                         </form>
@@ -166,11 +167,11 @@
                         <div class="form-footer-trust">
                             <div class="trust-badge">
                                 <i class="bi bi-shield-check-fill"></i>
-                                <span>100% seguro</span>
+                                <span>100% gratuito</span>
                             </div>
                             <div class="trust-badge">
-                                <i class="bi bi-star-fill"></i>
-                                <span>Primeiros usuários terão vantagens</span>
+                                <i class="bi bi-lightning-fill"></i>
+                                <span>Resultado instantâneo</span>
                             </div>
                         </div>
                     </div>
@@ -226,12 +227,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    Quando vou receber acesso?
+                                    Isso realmente funciona?
                                 </button>
                             </h3>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Estamos liberando acesso aos poucos por WhatsApp. Quem cadastra primeiro recebe antes.
+                                    Sim. A análise combina dados reais do Google Trends (interesse de busca) com sinais de saturação dos principais marketplaces brasileiros. Não é garantia de sucesso, mas ajuda você a tomar decisões baseadas em dados reais em vez de achismo.
                                 </div>
                             </div>
                         </div>
@@ -239,12 +240,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Funciona para Shopee e Mercado Livre?
+                                    Os dados são reais ou inventados?
                                 </button>
                             </h3>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Sim. Analisamos os principais marketplaces brasileiros.
+                                    100% reais. Usamos a API oficial do Google Trends para medir o interesse de busca, e verificamos a concorrência em marketplaces como Mercado Livre e Shopee. Os dados são atualizados constantemente.
                                 </div>
                             </div>
                         </div>
@@ -252,12 +253,12 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Vou pagar?
+                                    Por que a análise é grátis?
                                 </button>
                             </h3>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Primeiros cadastrados ganham condições especiais.
+                                    Estamos validando o produto. Você pode fazer 1 análise grátis para testar. Se achar útil e quiser acesso ilimitado, terá a opção de entrar na lista de espera da versão completa.
                                 </div>
                             </div>
                         </div>

@@ -5,6 +5,7 @@ app_name = 'market'
 
 urlpatterns = [
     path('test/', views.test_analysis, name='test'),
+    path('feedback/', views.submit_feedback, name='submit_feedback'),
 
     # Mercado Livre OAuth
     path('mercadolivre/authorize/', views.ml_authorize, name='ml_authorize'),
