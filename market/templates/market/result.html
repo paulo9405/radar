@@ -181,9 +181,17 @@
                 <span class="source-badge source-mock">⚠ Mercado Livre (Mock)</span>
             {% endif %}
             {% if analysis.data_sources.trends == 'google_trends' %}
-                <span class="source-badge source-api">📈 Google Trends LIVE</span>
+                <span class="source-badge source-api" style="background: #d4edda; color: #155724; font-weight: bold;">
+                    ✅ Google Trends LIVE (Real Data)
+                </span>
+            {% elif analysis.data_sources.trends == 'mock_fallback' %}
+                <span class="source-badge source-mock" style="background: #fff3cd; color: #856404; font-weight: bold;">
+                    ⚠️ Google Trends MOCK (Fallback)
+                </span>
             {% else %}
-                <span class="source-badge source-mock">⚠ Google Trends (Mock)</span>
+                <span class="source-badge" style="background: #f8d7da; color: #721c24; font-weight: bold;">
+                    ❌ Google Trends ERROR
+                </span>
             {% endif %}
         </div>
 
@@ -225,8 +233,17 @@
         </div>
 
         {% if analysis.data_sources.trends == 'google_trends' %}
-        <div class="score-card">
-            <h3>📈 Insights do Google Trends (Dados Reais)</h3>
+        <div class="score-card" style="border: 3px solid #28a745;">
+            <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #155724; margin: 0;">
+                    ✅ Google Trends REAL DATA VERIFIED
+                </h3>
+                <p style="color: #155724; margin: 5px 0 0 0; font-size: 0.9rem;">
+                    This analysis uses LIVE data from Google Trends API (pytrends)
+                </p>
+            </div>
+
+            <h3>📈 Insights do Google Trends</h3>
 
             <div class="individual-scores">
                 <div class="score-item">
@@ -293,6 +310,36 @@
                 </div>
             </div>
             {% endif %}
+
+            <!-- Debug Section: Raw Values -->
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px dashed #667eea;">
+                <h5 style="color: #667eea; margin-bottom: 15px;">🔧 Debug: Raw Google Trends Values</h5>
+                <div style="font-family: monospace; font-size: 0.85rem; line-height: 1.8;">
+                    <div><strong>Provider:</strong> {{ analysis.raw_data.trends.provider }}</div>
+                    <div><strong>Source:</strong> {{ analysis.raw_data.trends.source }}</div>
+                    <div><strong>Trend Direction:</strong> {{ analysis.raw_data.trends.trend_direction }}</div>
+                    <div><strong>Trend Strength:</strong> {{ analysis.raw_data.trends.trend_strength|floatformat:1 }}/10</div>
+                    <div><strong>Growth 30d:</strong> {{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</div>
+                    <div><strong>Growth 90d:</strong> {{ analysis.raw_data.trends.growth_90d|floatformat:1 }}%</div>
+                    <div><strong>Momentum Score:</strong> {{ analysis.raw_data.trends.momentum_score|floatformat:1 }}/10</div>
+                    <div><strong>Stability Score:</strong> {{ analysis.raw_data.trends.stability_score|floatformat:1 }}/10</div>
+                    <div><strong>Volatility:</strong> {{ analysis.raw_data.trends.volatility|floatformat:1 }}%</div>
+                    <div><strong>Current Interest:</strong> {{ analysis.raw_data.trends.current_interest }}/100</div>
+                    <div><strong>Peak Interest:</strong> {{ analysis.raw_data.trends.peak_interest }}/100</div>
+                    <div><strong>Average Interest:</strong> {{ analysis.raw_data.trends.average_interest|floatformat:1 }}</div>
+                    <div><strong>Seasonality Detected:</strong> {{ analysis.raw_data.trends.seasonality_detected }}</div>
+                    <div><strong>Confidence:</strong> {{ analysis.raw_data.trends.confidence|floatformat:2 }}</div>
+
+                    {% if analysis.raw_data.trends.raw_data.interest_over_time %}
+                    <div style="margin-top: 10px;">
+                        <strong>Interest Over Time (last 10 values):</strong><br>
+                        <span style="color: #666;">
+                            {{ analysis.raw_data.trends.raw_data.interest_over_time|slice:"-10:" }}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         {% endif %}
 

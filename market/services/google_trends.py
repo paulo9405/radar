@@ -42,7 +42,9 @@ def get_trends_data(query: str) -> dict:
             - confidence: float (0-1)
             - source: 'google_trends' or 'mock_fallback'
     """
-    print(f"[Google Trends Service] Fetching data for: {query}")
+    print("=" * 70)
+    print(f"[Google Trends Service] 🔍 Fetching data for: {query}")
+    print("=" * 70)
 
     # Try real Google Trends first
     if _trends_provider.is_available():
@@ -52,14 +54,33 @@ def get_trends_data(query: str) -> dict:
             if signals:
                 # Convert to legacy format for compatibility
                 normalized = _normalize_trends_signals(signals)
-                print(f"[Google Trends Service] ✅ Using REAL Google Trends data")
+                print("=" * 70)
+                print(f"[Google Trends Service] ✅ SUCCESS: Using REAL Google Trends data!")
+                print(f"[Google Trends Service]   Source: pytrends API (live)")
+                print(f"[Google Trends Service]   Provider: {normalized.get('provider')}")
+                print("=" * 70)
                 return normalized
+            else:
+                print("=" * 70)
+                print(f"[Google Trends Service] ⚠️  Provider returned None")
+                print(f"[Google Trends Service]   Reason: Likely rate-limited or empty results")
+                print("=" * 70)
 
         except Exception as e:
-            print(f"[Google Trends Service] Error with real provider: {e}")
+            print("=" * 70)
+            print(f"[Google Trends Service] ❌ Error with real provider: {e}")
+            print("=" * 70)
+    else:
+        print("=" * 70)
+        print(f"[Google Trends Service] ⚠️  Provider not available")
+        print("=" * 70)
 
     # Fallback to mock data
-    print(f"[Google Trends Service] ⚠️  Falling back to mock data")
+    print("=" * 70)
+    print(f"[Google Trends Service] ⚠️  FALLBACK: Using MOCK data")
+    print(f"[Google Trends Service]   Source: Deterministic mock generator")
+    print(f"[Google Trends Service]   This is NOT real Google Trends data")
+    print("=" * 70)
     return _get_mock_trends_data(query)
 
 

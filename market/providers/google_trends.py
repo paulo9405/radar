@@ -100,15 +100,24 @@ class GoogleTrendsProvider:
             print(f"[{self.name}] Provider not available")
             return None
 
-        print(f"[{self.name}] Fetching trend signals for: {query}")
+        print(f"[{self.name}] 🔍 Fetching trend signals for: {query}")
+        print(f"[{self.name}]   Timeframe: today 3-m (90 days)")
+        print(f"[{self.name}]   Source: REAL pytrends API")
 
         try:
             # Get interest over time (90 days)
             interest_data = self._get_interest_over_time(query, timeframe='today 3-m')
 
             if interest_data is None or interest_data.empty:
-                print(f"[{self.name}] No interest data found for: {query}")
+                print(f"[{self.name}] ❌ No interest data found for: {query}")
+                print(f"[{self.name}]   Reason: Empty DataFrame returned from Google Trends")
+                print(f"[{self.name}]   This usually means:")
+                print(f"[{self.name}]     - Query too niche (no search volume)")
+                print(f"[{self.name}]     - Rate limit exceeded (HTTP 429)")
+                print(f"[{self.name}]     - Network error")
                 return None
+
+            print(f"[{self.name}] ✅ Interest data received: {len(interest_data)} data points")
 
             # Extract trend signals
             signals = {
@@ -155,10 +164,28 @@ class GoogleTrendsProvider:
             }
 
             print(f"[{self.name}] ✅ Trend signals extracted successfully")
+            print(f"[{self.name}]   SOURCE: REAL GOOGLE TRENDS DATA (pytrends)")
             print(f"[{self.name}]   Direction: {signals['trend_direction']}")
+            print(f"[{self.name}]   Growth 30d: {signals['growth_30d']:.1f}%")
             print(f"[{self.name}]   Growth 90d: {signals['growth_90d']:.1f}%")
             print(f"[{self.name}]   Momentum: {signals['momentum_score']:.1f}/10")
+            print(f"[{self.name}]   Stability: {signals['stability_score']:.1f}/10")
+            print(f"[{self.name}]   Volatility: {signals['volatility']:.1f}%")
+            print(f"[{self.name}]   Current Interest: {signals['current_interest']}/100")
             print(f"[{self.name}]   Confidence: {signals['confidence']:.0%}")
+            print(f"[{self.name}]   Data Points: {signals['data_points']}")
+
+            # Log related queries status
+            if signals['related_queries']:
+                print(f"[{self.name}]   Related Queries: {len(signals['related_queries'])} found")
+            else:
+                print(f"[{self.name}]   Related Queries: None found")
+
+            # Log regional data status
+            if signals['top_regions']:
+                print(f"[{self.name}]   Top Regions: {len(signals['top_regions'])} found")
+            else:
+                print(f"[{self.name}]   Top Regions: None found")
 
             return signals
 
@@ -168,21 +195,33 @@ class GoogleTrendsProvider:
 
     def _get_interest_over_time(self, query: str, timeframe: str = 'today 3-m') -> Optional[pd.DataFrame]:
         """Fetch interest over time data from Google Trends."""
+        print(f"[{self.name}]   → Requesting interest_over_time...")
+        print(f"[{self.name}]     Query: [{query}]")
+        print(f"[{self.name}]     Timeframe: {timeframe}")
+
         try:
             self.pytrend.build_payload([query], timeframe=timeframe)
+            print(f"[{self.name}]     Payload built successfully")
+
             data = self.pytrend.interest_over_time()
+            print(f"[{self.name}]     Response received")
 
             if data.empty:
+                print(f"[{self.name}]     ⚠️  Empty DataFrame returned")
                 return None
+
+            print(f"[{self.name}]     ✅ Data received: {len(data)} rows, {len(data.columns)} columns")
 
             # Remove 'isPartial' column if exists
             if 'isPartial' in data.columns:
                 data = data.drop(columns=['isPartial'])
+                print(f"[{self.name}]     Removed 'isPartial' column")
 
             return data
 
         except Exception as e:
-            print(f"[{self.name}] Error fetching interest over time: {e}")
+            print(f"[{self.name}]     ❌ Error fetching interest over time: {e}")
+            print(f"[{self.name}]     Exception type: {type(e).__name__}")
             return None
 
     def _calculate_trend_direction(self, data: pd.DataFrame) -> str:
@@ -393,11 +432,13 @@ class GoogleTrendsProvider:
         Returns:
             list: Top regions with interest scores
         """
+        print(f"[{self.name}]   → Requesting regional interest...")
         try:
             self.pytrend.build_payload([query], timeframe='today 3-m')
             regional_data = self.pytrend.interest_by_region(resolution='REGION', inc_low_vol=False)
 
             if regional_data.empty:
+                print(f"[{self.name}]     ⚠️  No regional data returned")
                 return []
 
             # Sort by interest and get top regions
@@ -410,10 +451,11 @@ class GoogleTrendsProvider:
                     'interest': int(row[query])
                 })
 
+            print(f"[{self.name}]     ✅ Found {len(regions)} regions")
             return regions
 
         except Exception as e:
-            print(f"[{self.name}] Error fetching regional data: {e}")
+            print(f"[{self.name}]     ❌ Error fetching regional data: {e}")
             return []
 
     def _get_related_queries(self, query: str, limit: int = 5) -> List[str]:
@@ -427,29 +469,35 @@ class GoogleTrendsProvider:
         Returns:
             list: Related search queries
         """
+        print(f"[{self.name}]   → Requesting related queries...")
         try:
             self.pytrend.build_payload([query], timeframe='today 3-m')
             related = self.pytrend.related_queries()
 
             if not related or query not in related:
+                print(f"[{self.name}]     ⚠️  No related queries returned")
                 return []
 
             # Get rising queries
             rising = related[query]['rising']
 
             if rising is None or rising.empty:
+                print(f"[{self.name}]     No rising queries, trying top queries...")
                 # Fallback to top queries
                 top = related[query]['top']
                 if top is None or top.empty:
+                    print(f"[{self.name}]     ⚠️  No top queries either")
                     return []
                 queries = top['query'].head(limit).tolist()
+                print(f"[{self.name}]     ✅ Found {len(queries)} top queries")
             else:
                 queries = rising['query'].head(limit).tolist()
+                print(f"[{self.name}]     ✅ Found {len(queries)} rising queries")
 
             return queries
 
         except Exception as e:
-            print(f"[{self.name}] Error fetching related queries: {e}")
+            print(f"[{self.name}]     ❌ Error fetching related queries: {e}")
             return []
 
     def _calculate_confidence(self, data: pd.DataFrame) -> float:
