@@ -266,6 +266,24 @@
             #feedback-section label span {
                 font-size: 0.9rem;
             }
+
+            /* Feedback success mobile */
+            #feedback-success {
+                padding: 30px 20px !important;
+            }
+
+            #feedback-success h4 {
+                font-size: 1.2rem !important;
+            }
+
+            #feedback-success p {
+                font-size: 0.9rem !important;
+            }
+
+            #feedback-success a {
+                padding: 12px 24px !important;
+                font-size: 0.95rem !important;
+            }
         }
 
         @media (max-width: 480px) {
@@ -279,6 +297,16 @@
 
             .final-score .score-number {
                 font-size: 2.2rem;
+            }
+
+            /* Detalhes da busca mobile small */
+            .score-card[style*="grid-template-columns: repeat(2, 1fr)"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Recursos bloqueados mobile small */
+            div[style*="grid-template-columns: repeat(2, 1fr)"] {
+                grid-template-columns: 1fr !important;
             }
         }
     </style>
@@ -345,6 +373,203 @@
             <h3>📊 Resumo da Análise</h3>
             <div class="summary-box">
                 {{ analysis.summary }}
+            </div>
+        </div>
+
+        <!-- Detalhes da Busca -->
+        <div class="score-card" style="padding: 25px;">
+            <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 20px; color: #333;">📊 Detalhes da Busca</h3>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <!-- Produto -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">📦 Produto</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">{{ query }}</div>
+                </div>
+
+                <!-- Categoria -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">🏷️ Categoria</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">
+                        {% if analysis.scores.demand >= 8 %}Produtos Populares
+                        {% elif analysis.scores.demand >= 6 %}Eletrônicos e Acessórios
+                        {% else %}Diversos{% endif %}
+                    </div>
+                </div>
+
+                <!-- Volume -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">📈 Volume de Interesse</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">
+                        {% if analysis.raw_data.trends.current_interest >= 70 %}Muito Alto
+                        {% elif analysis.raw_data.trends.current_interest >= 50 %}Alto
+                        {% elif analysis.raw_data.trends.current_interest >= 30 %}Moderado
+                        {% else %}Baixo{% endif %}
+                    </div>
+                </div>
+
+                <!-- Anúncios -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">🏪 Anúncios Estimados</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">
+                        {% if analysis.scores.competition >= 8 %}~{{ analysis.scores.competition|floatformat:0 }}50+
+                        {% elif analysis.scores.competition >= 6 %}~{{ analysis.scores.competition|floatformat:0 }}00+
+                        {% else %}~{{ analysis.scores.competition|floatformat:0 }}0+{% endif %}
+                    </div>
+                </div>
+
+                <!-- Concorrência -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">⚔️ Concorrência</div>
+                    <div style="font-size: 0.95rem; font-weight: 600;">
+                        {% if analysis.scores.competition >= 8 %}
+                            <span style="color: #dc3545;">Muito Alta</span>
+                        {% elif analysis.scores.competition >= 6 %}
+                            <span style="color: #ffc107;">Elevada</span>
+                        {% elif analysis.scores.competition >= 4 %}
+                            <span style="color: #17a2b8;">Moderada</span>
+                        {% else %}
+                            <span style="color: #28a745;">Baixa</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Faixa de Preço -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">💰 Faixa de Preço</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">
+                        {% if analysis.scores.price >= 8 %}R$ 100-500
+                        {% elif analysis.scores.price >= 6 %}R$ 50-200
+                        {% elif analysis.scores.price >= 4 %}R$ 30-100
+                        {% else %}R$ 10-50{% endif %}
+                    </div>
+                </div>
+
+                <!-- Tendência 30d -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">📊 Tendência 30 dias</div>
+                    <div style="font-size: 0.95rem; font-weight: 600;">
+                        {% if analysis.raw_data.trends.growth_30d > 0 %}
+                            <span style="color: #28a745;">+{{ analysis.raw_data.trends.growth_30d|floatformat:0 }}%</span>
+                        {% elif analysis.raw_data.trends.growth_30d < 0 %}
+                            <span style="color: #dc3545;">{{ analysis.raw_data.trends.growth_30d|floatformat:0 }}%</span>
+                        {% else %}
+                            <span style="color: #6c757d;">Estável</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Oportunidade -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">🎯 Nível de Oportunidade</div>
+                    <div style="font-size: 0.95rem; font-weight: 600;">
+                        {% if analysis.classification == 'excellent' %}
+                            <span style="color: #28a745;">Excelente</span>
+                        {% elif analysis.classification == 'good' %}
+                            <span style="color: #17a2b8;">Boa</span>
+                        {% elif analysis.classification == 'risky' %}
+                            <span style="color: #ffc107;">Moderada</span>
+                        {% else %}
+                            <span style="color: #dc3545;">Baixa</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Confiança -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">✅ Confiança da Análise</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">{{ analysis.confidence_level }}%</div>
+                </div>
+
+                <!-- Fontes -->
+                <div style="background: #f8f9fa; padding: 14px; border-radius: 8px; border-left: 3px solid #667eea;">
+                    <div style="font-size: 0.8rem; color: #6c757d; margin-bottom: 4px; font-weight: 500;">🔍 Fontes Utilizadas</div>
+                    <div style="font-size: 0.95rem; color: #333; font-weight: 600;">
+                        {% if analysis.data_sources.trends == 'google_trends' %}Google Trends
+                        {% else %}Estimativa{% endif %},
+                        {% if analysis.data_sources.marketplace == 'mercado_livre_api' %}ML API{% else %}ML{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sinais Encontrados pela IA -->
+        <div class="score-card" style="padding: 25px;">
+            <h3 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 18px; color: #333;">🤖 Sinais Encontrados pela IA</h3>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Sinal: Alta procura -->
+                {% if analysis.scores.demand >= 7 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Alta procura em marketplaces</span>
+                </div>
+                {% endif %}
+
+                <!-- Sinal: Concorrência -->
+                {% if analysis.scores.competition >= 7 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255, 193, 7, 0.08); border-left: 3px solid #ffc107; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Concorrência elevada</span>
+                </div>
+                {% elif analysis.scores.competition >= 5 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255, 193, 7, 0.08); border-left: 3px solid #ffc107; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Concorrência moderada</span>
+                </div>
+                {% else %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Concorrência controlável</span>
+                </div>
+                {% endif %}
+
+                <!-- Sinal: Saturação -->
+                {% if analysis.scores.saturation >= 7 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255, 193, 7, 0.08); border-left: 3px solid #ffc107; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Saturação elevada detectada</span>
+                </div>
+                {% elif analysis.scores.saturation >= 5 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255, 193, 7, 0.08); border-left: 3px solid #ffc107; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Saturação moderada</span>
+                </div>
+                {% else %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Mercado com espaço</span>
+                </div>
+                {% endif %}
+
+                <!-- Sinal: Reconhecimento -->
+                {% if analysis.raw_data.trends.current_interest >= 50 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Produto conhecido pelo público</span>
+                </div>
+                {% endif %}
+
+                <!-- Sinal: Crescimento -->
+                {% if analysis.raw_data.trends.trend_direction == 'downward' %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(255, 193, 7, 0.08); border-left: 3px solid #ffc107; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Crescimento desacelerando</span>
+                </div>
+                {% elif analysis.raw_data.trends.trend_direction == 'upward' %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Tendência em crescimento</span>
+                </div>
+                {% endif %}
+
+                <!-- Sinal: Preço -->
+                {% if analysis.scores.price >= 6 %}
+                <div style="display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: rgba(40, 167, 69, 0.08); border-left: 3px solid #28a745; border-radius: 6px;">
+                    <span style="font-size: 1.2rem;">✅</span>
+                    <span style="font-size: 0.95rem; color: #333; font-weight: 500;">Boa faixa de preço</span>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -430,6 +655,86 @@
         </div>
         {% endif %}
 
+        <!-- Recursos do Acesso Antecipado -->
+        <div class="score-card" style="padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; position: relative; overflow: hidden;">
+            <!-- Overlay sutil -->
+            <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.03); pointer-events: none;"></div>
+
+            <div style="position: relative; z-index: 1;">
+                <div style="text-align: center; margin-bottom: 25px;">
+                    <h3 style="color: white; font-size: 1.3rem; font-weight: 600; margin-bottom: 10px;">Recursos do acesso antecipado</h3>
+                    <p style="color: rgba(255, 255, 255, 0.9); font-size: 0.95rem; margin: 0;">Funcionalidades disponíveis na versão completa</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 25px;">
+                    <!-- Recursos bloqueados -->
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Análise avançada de concorrência</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Produtos em tendência antes da alta</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Alertas automáticos</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Comparação entre produtos</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Histórico de tendência 90 dias</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Produtos virais detectados por IA</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Saturação em marketplaces</span>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); padding: 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 1.1rem; opacity: 0.7;">🔒</span>
+                            <span style="color: white; font-size: 0.9rem; font-weight: 500;">Nichos emergentes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <p style="color: rgba(255, 255, 255, 0.95); font-size: 0.95rem; margin-bottom: 15px;">
+                        Entre para a lista de espera para receber acesso antecipado.
+                    </p>
+                    <a href="/" style="display: inline-block; background: white; color: #667eea; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s;">
+                        Quero acesso antecipado
+                    </a>
+                </div>
+            </div>
+        </div>
 
         <!-- Feedback Section - ALWAYS SHOW -->
         <div class="score-card" id="feedback-section" style="padding: 25px;">
@@ -500,14 +805,19 @@
                 </button>
 
                 <!-- Success Message (hidden initially) -->
-                <div id="feedback-success" style="display: none; background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
-                    <h4 style="margin: 0 0 10px 0; font-size: 1.1rem;">✅ Obrigado pelo feedback!</h4>
-                    <p style="margin: 0; font-size: 0.95rem;">
-                        Sua opinião ajuda a melhorar a plataforma.<br>
+                <div id="feedback-success" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+                    <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
+                    <h4 style="margin: 0 0 12px 0; font-size: 1.4rem; color: white; font-weight: 600;">Obrigado pelo feedback!</h4>
+                    <p style="margin: 0 0 20px 0; font-size: 1rem; color: rgba(255, 255, 255, 0.95); line-height: 1.6;">
+                        Sua opinião ajuda a melhorar o Radar de Tendências.
                         <span id="waitlist-message" style="display: none; margin-top: 8px; display: block;">
+                            <br>Você entrou na lista de acesso antecipado.<br>
                             Entraremos em contato através do seu WhatsApp.
                         </span>
                     </p>
+                    <a href="/" style="display: inline-block; background: white; color: #667eea; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s; margin-top: 10px;">
+                        Quero acesso antecipado
+                    </a>
                 </div>
 
                 <!-- Error Message (hidden initially) -->
@@ -543,11 +853,11 @@
         const feedbackForm = document.getElementById('feedback-form');
         const feedbackSuccess = document.getElementById('feedback-success');
         const feedbackError = document.getElementById('feedback-error');
-        const finalCta = document.getElementById('final-cta');
+        const enteredWaitlistCheckbox = document.getElementById('entered-waitlist');
 
-        // Only run if feedback form exists
-        if (!feedbackForm || !submitBtn || !ratingInput) {
-            console.log('Feedback form not found on this page');
+        // Only run if all required elements exist
+        if (!feedbackForm || !submitBtn || !ratingInput || !feedbackSuccess || !feedbackError) {
+            console.log('Feedback form elements not found on this page');
         } else {
 
         // Rating button styles
@@ -629,9 +939,11 @@
                     feedbackSuccess.style.display = 'block';
 
                     // Show waitlist message if checkbox was checked
-                    const enteredWaitlist = document.getElementById('entered-waitlist').checked;
-                    if (enteredWaitlist) {
-                        document.getElementById('waitlist-message').style.display = 'block';
+                    if (enteredWaitlistCheckbox && enteredWaitlistCheckbox.checked) {
+                        const waitlistMessage = document.getElementById('waitlist-message');
+                        if (waitlistMessage) {
+                            waitlistMessage.style.display = 'block';
+                        }
                     }
                 } else {
                     feedbackError.style.display = 'block';
