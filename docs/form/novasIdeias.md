@@ -1,0 +1,1 @@
+quero ter uma opccao onde se uma pessoa quer montar um negocio, eu pego todas as informacoes cm essa pessoa eu oferece meio q uma consultoria simples de como ela deve montar, como investes, de acordo cm a cidade e as informacoes da regiao dela e etc, talves aparecer ate em recursos bloqueaso

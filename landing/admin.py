@@ -29,7 +29,7 @@ class AnalysisFeedbackInline(admin.TabularInline):
     """Inline feedback display in WhatsAppLead admin"""
     model = AnalysisFeedback
     extra = 0
-    readonly_fields = ['product_query', 'rating', 'comments', 'would_pay', 'created_at']
+    readonly_fields = ['product_query', 'rating', 'comments', 'would_pay_for_analyses', 'entered_waitlist', 'created_at']
     can_delete = False
 
     def has_add_permission(self, request, obj=None):
@@ -93,20 +93,23 @@ class AnalysisFeedbackAdmin(admin.ModelAdmin):
         'product_query',
         'whatsapp_lead',
         'rating',
-        'would_pay',
+        'would_pay_for_analyses',
+        'entered_waitlist',
+        'product_score',
+        'confidence_level',
         'created_at'
     ]
-    list_filter = ['rating', 'would_pay', 'created_at']
+    list_filter = ['rating', 'would_pay_for_analyses', 'entered_waitlist', 'created_at']
     search_fields = ['product_query', 'comments', 'whatsapp_lead__whatsapp']
     readonly_fields = ['created_at', 'ip_address']
     date_hierarchy = 'created_at'
 
     fieldsets = (
         ('Produto Analisado', {
-            'fields': ('whatsapp_lead', 'product_query')
+            'fields': ('whatsapp_lead', 'product_query', 'product_score', 'confidence_level')
         }),
         ('Feedback', {
-            'fields': ('rating', 'comments', 'would_pay')
+            'fields': ('rating', 'comments', 'would_pay_for_analyses', 'entered_waitlist')
         }),
         ('Metadados', {
             'fields': ('ip_address', 'created_at')

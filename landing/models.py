@@ -235,9 +235,28 @@ class AnalysisFeedback(models.Model):
         verbose_name='Comentários'
     )
 
-    would_pay = models.BooleanField(
+    would_pay_for_analyses = models.BooleanField(
         default=False,
-        verbose_name='Pagaria por isso'
+        verbose_name='Pagaria por análises assim'
+    )
+
+    entered_waitlist = models.BooleanField(
+        default=False,
+        verbose_name='Entrou na lista de espera'
+    )
+
+    product_score = models.DecimalField(
+        max_digits=4,
+        decimal_places=1,
+        null=True,
+        blank=True,
+        verbose_name='Score Final'
+    )
+
+    confidence_level = models.IntegerField(
+        null=True,
+        blank=True,
+        verbose_name='Nível de Confiança (%)'
     )
 
     ip_address = models.GenericIPAddressField(

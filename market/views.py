@@ -100,7 +100,12 @@ def submit_feedback(request):
         product_query = request.POST.get('product_query', '')
         rating = request.POST.get('rating')
         comments = request.POST.get('comments', '').strip()
-        would_pay = request.POST.get('would_pay') == 'on'
+        would_pay_for_analyses = request.POST.get('would_pay_for_analyses') == 'on'
+        entered_waitlist = request.POST.get('entered_waitlist') == 'on'
+
+        # Analysis data
+        product_score = request.POST.get('product_score')
+        confidence_level = request.POST.get('confidence_level')
 
         # Validation
         if not rating or rating not in dict(AnalysisFeedback.RATING_CHOICES):
@@ -112,6 +117,8 @@ def submit_feedback(request):
             try:
                 whatsapp_lead = WhatsAppLead.objects.get(id=whatsapp_lead_id)
                 whatsapp_lead.submitted_feedback = True
+                if entered_waitlist:
+                    whatsapp_lead.joined_waitlist = True
                 whatsapp_lead.save()
             except WhatsAppLead.DoesNotExist:
                 pass
@@ -122,7 +129,10 @@ def submit_feedback(request):
             product_query=product_query,
             rating=rating,
             comments=comments,
-            would_pay=would_pay,
+            would_pay_for_analyses=would_pay_for_analyses,
+            entered_waitlist=entered_waitlist,
+            product_score=float(product_score) if product_score else None,
+            confidence_level=int(confidence_level) if confidence_level else None,
             ip_address=_get_client_ip(request)
         )
 

@@ -168,64 +168,117 @@
 
         /* Mobile Responsiveness - Compact Cards */
         @media (max-width: 768px) {
+            body {
+                padding: 10px 0;
+            }
+
             .result-container {
-                padding: 0 15px;
+                padding: 0 12px;
             }
 
             .header {
-                padding: 20px;
-                margin-bottom: 15px;
+                padding: 18px;
+                margin-bottom: 12px;
             }
 
             .header h1 {
-                font-size: 1.3rem;
+                font-size: 1.25rem;
+                line-height: 1.3;
+            }
+
+            .header .product-name {
+                display: block;
+                margin-top: 5px;
+            }
+
+            .confidence-badge, .source-badge {
+                font-size: 0.75rem;
+                padding: 4px 10px;
+                margin-left: 0;
+                margin-top: 8px;
+                display: inline-block;
             }
 
             .score-card {
-                padding: 20px;
-                margin-bottom: 15px;
+                padding: 18px;
+                margin-bottom: 12px;
             }
 
             .final-score {
-                padding: 20px;
+                padding: 18px;
             }
 
             .final-score .score-number {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
 
             .final-score .classification {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
             .individual-scores {
-                grid-template-columns: 1fr;
-                gap: 10px;
-                margin-top: 15px;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                margin-top: 12px;
             }
 
             .score-item {
-                padding: 12px;
+                padding: 10px;
+            }
+
+            .score-item .label {
+                font-size: 0.8rem;
             }
 
             .score-item .value {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
             }
 
             .summary-box {
-                padding: 15px;
-                margin-top: 15px;
-                font-size: 0.95rem;
-            }
-
-            .locked-features, .cta-box {
-                padding: 20px;
-                margin-top: 15px;
+                padding: 14px;
+                margin-top: 12px;
+                font-size: 0.9rem;
             }
 
             .btn-new-search {
                 padding: 10px 20px;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
+            }
+
+            /* Feedback section mobile */
+            #feedback-section {
+                padding: 18px;
+            }
+
+            #feedback-section h3 {
+                font-size: 1.1rem;
+            }
+
+            #feedback-section .rating-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+
+            #feedback-section textarea {
+                font-size: 0.9rem;
+            }
+
+            #feedback-section label span {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .individual-scores {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+
+            .final-score .score-number {
+                font-size: 2.2rem;
             }
         }
     </style>
@@ -296,26 +349,26 @@
         </div>
 
         {% if analysis.data_sources.trends == 'google_trends' %}
-        <div class="score-card" style="border: 3px solid #28a745;">
-            <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <h3 style="color: #155724; margin: 0;">
-                    ✅ Google Trends REAL DATA VERIFIED
+        <div class="score-card" style="border: 2px solid #28a745; padding: 20px;">
+            <div style="background: #d4edda; padding: 12px 15px; border-radius: 8px; margin-bottom: 18px;">
+                <h3 style="color: #155724; margin: 0; font-size: 1rem; font-weight: 600;">
+                    ✅ Dados Reais do Google Trends Verificados
                 </h3>
-                <p style="color: #155724; margin: 5px 0 0 0; font-size: 0.9rem;">
-                    This analysis uses LIVE data from Google Trends API (pytrends)
+                <p style="color: #155724; margin: 5px 0 0 0; font-size: 0.85rem;">
+                    Análise baseada em dados ao vivo da API oficial
                 </p>
             </div>
 
-            <h3>📈 Insights do Google Trends</h3>
+            <h3 style="font-size: 1.2rem; margin-bottom: 20px;">📈 Dados do Google Trends</h3>
 
-            <div class="individual-scores">
-                <div class="score-item">
-                    <div class="label">🎯 Direção da Tendência</div>
-                    <div class="value" style="font-size: 1.3rem;">
+            <div class="individual-scores" style="grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div class="score-item" style="padding: 12px;">
+                    <div class="label" style="font-size: 0.85rem;">🎯 Tendência</div>
+                    <div class="value" style="font-size: 1.1rem;">
                         {% if analysis.raw_data.trends.trend_direction == 'upward' %}
                             ↗️ Crescendo
                         {% elif analysis.raw_data.trends.trend_direction == 'downward' %}
-                            ↘️ Em Queda
+                            ↘️ Queda
                         {% elif analysis.raw_data.trends.trend_direction == 'volatile' %}
                             ⚡ Volátil
                         {% else %}
@@ -324,19 +377,19 @@
                     </div>
                 </div>
 
-                <div class="score-item">
-                    <div class="label">🚀 Momentum</div>
-                    <div class="value">{{ analysis.raw_data.trends.momentum_score|floatformat:1 }}/10</div>
+                <div class="score-item" style="padding: 12px;">
+                    <div class="label" style="font-size: 0.85rem;">🚀 Momentum</div>
+                    <div class="value" style="font-size: 1.1rem;">{{ analysis.raw_data.trends.momentum_score|floatformat:1 }}/10</div>
                 </div>
 
-                <div class="score-item">
-                    <div class="label">📊 Interesse Atual</div>
-                    <div class="value">{{ analysis.raw_data.trends.current_interest }}/100</div>
+                <div class="score-item" style="padding: 12px;">
+                    <div class="label" style="font-size: 0.85rem;">📊 Interesse</div>
+                    <div class="value" style="font-size: 1.1rem;">{{ analysis.raw_data.trends.current_interest }}/100</div>
                 </div>
 
-                <div class="score-item">
-                    <div class="label">📈 Crescimento 30d</div>
-                    <div class="value" style="font-size: 1.5rem;">
+                <div class="score-item" style="padding: 12px;">
+                    <div class="label" style="font-size: 0.85rem;">📈 Cresc. 30d</div>
+                    <div class="value" style="font-size: 1.1rem;">
                         {% if analysis.raw_data.trends.growth_30d > 0 %}
                             <span style="color: #28a745;">+{{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</span>
                         {% elif analysis.raw_data.trends.growth_30d < 0 %}
@@ -349,11 +402,11 @@
             </div>
 
             {% if analysis.raw_data.trends.related_queries %}
-            <div style="margin-top: 20px;">
-                <h5 style="color: #667eea; margin-bottom: 10px;">🔍 Buscas Relacionadas</h5>
-                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    {% for query in analysis.raw_data.trends.related_queries|slice:":5" %}
-                        <span style="background: #e7f3ff; color: #007bff; padding: 5px 12px; border-radius: 15px; font-size: 0.85rem;">
+            <div style="margin-top: 15px;">
+                <h5 style="color: #667eea; margin-bottom: 8px; font-size: 0.95rem;">🔍 Buscas Relacionadas</h5>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    {% for query in analysis.raw_data.trends.related_queries|slice:":4" %}
+                        <span style="background: #e7f3ff; color: #007bff; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem;">
                             {{ query }}
                         </span>
                     {% endfor %}
@@ -362,11 +415,11 @@
             {% endif %}
 
             {% if analysis.raw_data.trends.top_regions %}
-            <div style="margin-top: 20px;">
-                <h5 style="color: #667eea; margin-bottom: 10px;">🌎 Top Regiões</h5>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-                    {% for region in analysis.raw_data.trends.top_regions|slice:":4" %}
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px;">
+            <div style="margin-top: 15px;">
+                <h5 style="color: #667eea; margin-bottom: 8px; font-size: 0.95rem;">🌎 Principais Regiões</h5>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                    {% for region in analysis.raw_data.trends.top_regions|slice:":2" %}
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 6px; font-size: 0.85rem;">
                             <strong>{{ region.region }}</strong>: {{ region.interest }}/100
                         </div>
                     {% endfor %}
@@ -374,78 +427,24 @@
             </div>
             {% endif %}
 
-            <!-- Debug Section: Raw Values -->
-            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px dashed #667eea;">
-                <h5 style="color: #667eea; margin-bottom: 15px;">🔧 Debug: Raw Google Trends Values</h5>
-                <div style="font-family: monospace; font-size: 0.85rem; line-height: 1.8;">
-                    <div><strong>Provider:</strong> {{ analysis.raw_data.trends.provider }}</div>
-                    <div><strong>Source:</strong> {{ analysis.raw_data.trends.source }}</div>
-                    <div><strong>Trend Direction:</strong> {{ analysis.raw_data.trends.trend_direction }}</div>
-                    <div><strong>Trend Strength:</strong> {{ analysis.raw_data.trends.trend_strength|floatformat:1 }}/10</div>
-                    <div><strong>Growth 30d:</strong> {{ analysis.raw_data.trends.growth_30d|floatformat:1 }}%</div>
-                    <div><strong>Growth 90d:</strong> {{ analysis.raw_data.trends.growth_90d|floatformat:1 }}%</div>
-                    <div><strong>Momentum Score:</strong> {{ analysis.raw_data.trends.momentum_score|floatformat:1 }}/10</div>
-                    <div><strong>Stability Score:</strong> {{ analysis.raw_data.trends.stability_score|floatformat:1 }}/10</div>
-                    <div><strong>Volatility:</strong> {{ analysis.raw_data.trends.volatility|floatformat:1 }}%</div>
-                    <div><strong>Current Interest:</strong> {{ analysis.raw_data.trends.current_interest }}/100</div>
-                    <div><strong>Peak Interest:</strong> {{ analysis.raw_data.trends.peak_interest }}/100</div>
-                    <div><strong>Average Interest:</strong> {{ analysis.raw_data.trends.average_interest|floatformat:1 }}</div>
-                    <div><strong>Seasonality Detected:</strong> {{ analysis.raw_data.trends.seasonality_detected }}</div>
-                    <div><strong>Confidence:</strong> {{ analysis.raw_data.trends.confidence|floatformat:2 }}</div>
-
-                    {% if analysis.raw_data.trends.raw_data.interest_over_time %}
-                    <div style="margin-top: 10px;">
-                        <strong>Interest Over Time (last 10 values):</strong><br>
-                        <span style="color: #666;">
-                            {{ analysis.raw_data.trends.raw_data.interest_over_time|slice:"-10:" }}
-                        </span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
         </div>
         {% endif %}
 
-        {% if analysis.locked_fields %}
-        <div class="locked-features">
-            <h3>🔒 Recursos Premium Bloqueados</h3>
-            <p class="text-muted">
-                Faça upgrade para acessar análises completas:
-            </p>
-            {% for locked_feature in analysis.locked_fields %}
-                <div class="locked-item">
-                    {{ locked_feature }}
-                </div>
-            {% endfor %}
-        </div>
-
-        <div class="cta-box">
-            <h3>Quer a análise completa?</h3>
-            <p>
-                Desbloqueie acesso ilimitado a análises detalhadas, histórico,
-                alertas e muito mais.
-            </p>
-            <button class="btn btn-unlock">
-                Desbloquear Acesso Premium
-            </button>
-        </div>
-        {% endif %}
 
         <!-- Feedback Section - ALWAYS SHOW -->
-        <div class="score-card" id="feedback-section">
-            <h3 style="margin-bottom: 20px;">💬 O que você achou desta análise?</h3>
-            <p class="text-muted" style="margin-bottom: 20px;">
-                Sua opinião ajuda a melhorar o produto. Leva só 10 segundos!
-            </p>
+        <div class="score-card" id="feedback-section" style="padding: 25px;">
+            <h3 style="margin-bottom: 15px; font-size: 1.2rem; font-weight: 600;">O que você achou desta análise?</h3>
 
             <form id="feedback-form">
                 {% csrf_token %}
                 <input type="hidden" name="whatsapp_lead_id" value="{{ whatsapp_lead.id|default:'' }}">
                 <input type="hidden" name="product_query" value="{{ query }}">
+                <input type="hidden" name="product_score" value="{{ analysis.scores.final }}">
+                <input type="hidden" name="confidence_level" value="{{ analysis.confidence_level }}">
                 <input type="hidden" name="rating" id="rating-input">
 
                 <!-- Rating Buttons -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 18px;">
                     <button type="button" class="rating-btn" data-rating="very_useful">
                         ⭐ Muito útil
                     </button>
@@ -464,57 +463,58 @@
                 </div>
 
                 <!-- Optional Comments -->
-                <div style="margin-bottom: 20px;">
-                    <label for="comments" style="font-weight: 600; margin-bottom: 8px; display: block; color: #333;">
-                        Quer deixar um comentário? (opcional)
+                <div style="margin-bottom: 15px;">
+                    <label for="comments" style="font-weight: 500; margin-bottom: 6px; display: block; color: #333; font-size: 0.95rem;">
+                        Comentário opcional
                     </label>
                     <textarea
                         name="comments"
                         id="comments"
-                        rows="3"
+                        rows="2"
                         class="form-control"
-                        placeholder="O que funcionou bem? O que pode melhorar?"
-                        style="border-radius: 10px; border: 1px solid #dee2e6;"
+                        placeholder="Deixe um comentário (opcional)"
+                        style="border-radius: 8px; border: 1px solid #dee2e6; font-size: 0.95rem;"
                     ></textarea>
                 </div>
 
-                <!-- Would Pay Checkbox -->
-                <div style="margin-bottom: 20px;">
-                    <label style="display: flex; align-items: center; cursor: pointer; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                        <input type="checkbox" name="would_pay" style="margin-right: 10px; width: 20px; height: 20px;">
-                        <span style="font-weight: 600; color: #333;">
-                            💳 Eu pagaria por acesso ilimitado a análises assim
+                <!-- Checkboxes -->
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; padding: 12px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+                        <input type="checkbox" name="entered_waitlist" id="entered-waitlist" style="margin-right: 10px; width: 18px; height: 18px;">
+                        <span style="font-weight: 500; color: #333; font-size: 0.95rem;">
+                            Quero entrar na lista de acesso antecipado
+                        </span>
+                    </label>
+
+                    <label style="display: flex; align-items: center; cursor: pointer; padding: 12px; background: #f8f9fa; border-radius: 8px;">
+                        <input type="checkbox" name="would_pay_for_analyses" style="margin-right: 10px; width: 18px; height: 18px;">
+                        <span style="font-weight: 500; color: #333; font-size: 0.95rem;">
+                            Eu pagaria por análises assim
                         </span>
                     </label>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100" id="submit-feedback-btn" style="padding: 15px; border-radius: 10px; font-weight: 600; font-size: 1.1rem;" disabled>
-                    Enviar Feedback
+                <button type="submit" class="btn btn-primary w-100" id="submit-feedback-btn" style="padding: 14px; border-radius: 8px; font-weight: 600; font-size: 1rem; background: #667eea; border: none;" disabled>
+                    Enviar feedback
                 </button>
 
                 <!-- Success Message (hidden initially) -->
                 <div id="feedback-success" style="display: none; background: #d4edda; color: #155724; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
-                    <h4 style="margin: 0 0 10px 0;">✅ Obrigado pelo feedback!</h4>
-                    <p style="margin: 0;">Sua opinião é muito importante para nós.</p>
+                    <h4 style="margin: 0 0 10px 0; font-size: 1.1rem;">✅ Obrigado pelo feedback!</h4>
+                    <p style="margin: 0; font-size: 0.95rem;">
+                        Sua opinião ajuda a melhorar a plataforma.<br>
+                        <span id="waitlist-message" style="display: none; margin-top: 8px; display: block;">
+                            Entraremos em contato através do seu WhatsApp.
+                        </span>
+                    </p>
                 </div>
 
                 <!-- Error Message (hidden initially) -->
-                <div id="feedback-error" style="display: none; background: #f8d7da; color: #721c24; padding: 15px; border-radius: 10px; margin-top: 20px;">
+                <div id="feedback-error" style="display: none; background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem;">
                     Erro ao enviar feedback. Tente novamente.
                 </div>
             </form>
-
-            <!-- Final CTA (shown after feedback) -->
-            <div id="final-cta" style="display: none; margin-top: 30px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; text-align: center; color: white;">
-                <h3 style="margin-bottom: 15px; color: white;">🎯 Quer receber acesso completo quando lançarmos?</h3>
-                <p style="margin-bottom: 20px; opacity: 0.9;">
-                    Entre na lista para receber mais análises e recursos exclusivos
-                </p>
-                <a href="/" class="btn btn-unlock" style="background: white; color: #667eea; text-decoration: none; display: inline-block;">
-                    Entrar na Lista de Espera
-                </a>
-            </div>
         </div>
 
         {% if can_analyze_again %}
@@ -553,19 +553,19 @@
         // Rating button styles
         const ratingBtnStyle = `
             background: #f8f9fa;
-            border: 2px solid #dee2e6;
-            padding: 15px;
-            border-radius: 10px;
-            font-weight: 600;
+            border: 2px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            font-size: 0.9rem;
         `;
 
         const ratingBtnActiveStyle = `
             background: #667eea;
             border-color: #667eea;
             color: white;
-            transform: scale(1.05);
         `;
 
         ratingButtons.forEach(btn => {
@@ -590,15 +590,13 @@
 
             btn.addEventListener('mouseenter', function() {
                 if (this.style.color !== 'white') {
-                    this.style.transform = 'scale(1.02)';
                     this.style.borderColor = '#667eea';
                 }
             });
 
             btn.addEventListener('mouseleave', function() {
                 if (this.style.color !== 'white') {
-                    this.style.transform = 'scale(1)';
-                    this.style.borderColor = '#dee2e6';
+                    this.style.borderColor = '#e0e0e0';
                 }
             });
         });
@@ -630,20 +628,21 @@
                     // Show success message
                     feedbackSuccess.style.display = 'block';
 
-                    // Show final CTA after 1 second
-                    setTimeout(() => {
-                        finalCta.style.display = 'block';
-                    }, 1000);
+                    // Show waitlist message if checkbox was checked
+                    const enteredWaitlist = document.getElementById('entered-waitlist').checked;
+                    if (enteredWaitlist) {
+                        document.getElementById('waitlist-message').style.display = 'block';
+                    }
                 } else {
                     feedbackError.style.display = 'block';
                     feedbackError.textContent = data.error || 'Erro ao enviar feedback';
                     submitBtn.disabled = false;
-                    submitBtn.textContent = 'Enviar Feedback';
+                    submitBtn.textContent = 'Enviar feedback';
                 }
             } catch (error) {
                 feedbackError.style.display = 'block';
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Enviar Feedback';
+                submitBtn.textContent = 'Enviar feedback';
             }
         });
 
