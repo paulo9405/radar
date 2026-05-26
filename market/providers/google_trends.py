@@ -146,11 +146,11 @@ class GoogleTrendsProvider:
                 'peak_interest': self._get_peak_interest(interest_data),
                 'average_interest': self._get_average_interest(interest_data),
 
-                # Regional data
-                'top_regions': self._get_top_regions(query),
+                # Regional data - DISABLED FOR MVP (reduces rate limit risk)
+                'top_regions': [],  # self._get_top_regions(query),
 
-                # Related queries
-                'related_queries': self._get_related_queries(query),
+                # Related queries - DISABLED FOR MVP (reduces rate limit risk)
+                'related_queries': [],  # self._get_related_queries(query),
 
                 # Data quality
                 'confidence': self._calculate_confidence(interest_data),
@@ -165,6 +165,7 @@ class GoogleTrendsProvider:
 
             print(f"[{self.name}] ✅ Trend signals extracted successfully")
             print(f"[{self.name}]   SOURCE: REAL GOOGLE TRENDS DATA (pytrends)")
+            print(f"[{self.name}]   MODE: MVP (interest_over_time only)")
             print(f"[{self.name}]   Direction: {signals['trend_direction']}")
             print(f"[{self.name}]   Growth 30d: {signals['growth_30d']:.1f}%")
             print(f"[{self.name}]   Growth 90d: {signals['growth_90d']:.1f}%")
@@ -174,18 +175,8 @@ class GoogleTrendsProvider:
             print(f"[{self.name}]   Current Interest: {signals['current_interest']}/100")
             print(f"[{self.name}]   Confidence: {signals['confidence']:.0%}")
             print(f"[{self.name}]   Data Points: {signals['data_points']}")
-
-            # Log related queries status
-            if signals['related_queries']:
-                print(f"[{self.name}]   Related Queries: {len(signals['related_queries'])} found")
-            else:
-                print(f"[{self.name}]   Related Queries: None found")
-
-            # Log regional data status
-            if signals['top_regions']:
-                print(f"[{self.name}]   Top Regions: {len(signals['top_regions'])} found")
-            else:
-                print(f"[{self.name}]   Top Regions: None found")
+            print(f"[{self.name}]   Related Queries: DISABLED (MVP mode)")
+            print(f"[{self.name}]   Top Regions: DISABLED (MVP mode)")
 
             return signals
 

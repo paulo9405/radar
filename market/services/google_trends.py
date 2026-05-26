@@ -1,12 +1,15 @@
 """
-Google Trends data provider - NOW WITH REAL DATA!
+Google Trends data provider - WITH CACHING AND RATE-LIMIT PROTECTION!
 
-Phase 2 implementation using pytrends for actual Google Trends signals.
+Phase 2.1 implementation with database caching to avoid rate limits.
+Uses 24-hour cache TTL and cooldown protection after 429 errors.
 Falls back to mock data if provider unavailable (resilient architecture).
 """
 import hashlib
 from typing import Dict, Optional
+from django.utils import timezone
 from market.providers.google_trends import GoogleTrendsProvider
+from market.models import GoogleTrendsCache, GoogleTrendsCooldown
 
 
 # Initialize provider (singleton pattern)
@@ -15,38 +18,67 @@ _trends_provider = GoogleTrendsProvider()
 
 def get_trends_data(query: str) -> dict:
     """
-    Fetches trend data for a given product query.
+    Fetches trend data for a given product query with caching.
 
-    NOW USES REAL GOOGLE TRENDS DATA via pytrends!
+    NOW WITH CACHING AND RATE-LIMIT PROTECTION!
 
-    Falls back to mock data if:
-    - Provider unavailable
-    - Rate limit exceeded
-    - Network error
-    - Empty results
+    Flow:
+    1. Check cooldown status (if HTTP 429 recently)
+    2. Check cache (24-hour TTL)
+    3. If cache miss and not in cooldown, fetch from Google Trends
+    4. Store successful fetch in cache
+    5. Activate cooldown on HTTP 429
+    6. Fall back to mock if all else fails
 
     Args:
         query: Product search query
 
     Returns:
-        dict: Trends data including:
-            - trend_direction: 'upward', 'stable', 'downward', 'volatile'
-            - trend_strength: float (0-10)
-            - growth_30d: Percentage growth in last 30 days
-            - growth_90d: Percentage growth in last 90 days
-            - momentum_score: float (0-10)
-            - stability_score: float (0-10)
-            - current_interest: int (0-100)
-            - related_queries: list of related searches
-            - top_regions: list of top regions
-            - confidence: float (0-1)
-            - source: 'google_trends' or 'mock_fallback'
+        dict: Trends data including source indicator:
+            - source: 'google_trends' (live/cached) or 'mock_fallback'
     """
     print("=" * 70)
     print(f"[Google Trends Service] 🔍 Fetching data for: {query}")
     print("=" * 70)
 
-    # Try real Google Trends first
+    # Step 1: Check cooldown status
+    if GoogleTrendsCooldown.is_in_cooldown():
+        cooldown_status = GoogleTrendsCooldown.get_status()
+        remaining = cooldown_status.get('remaining_minutes', 0)
+        print(f"[Google Trends Service] ⏸️  COOLDOWN ACTIVE ({remaining} min remaining)")
+        print(f"[Google Trends Service]   Reason: {cooldown_status.get('reason')}")
+
+        # Check if we have cached data
+        cached = GoogleTrendsCache.get_cached(query)
+        if cached:
+            print(f"[Google Trends Service] 💾 Using CACHED data (during cooldown)")
+            normalized = _normalize_trends_signals(cached.raw_data)
+            normalized['source'] = 'google_trends'  # Mark as real data (just cached)
+            print("=" * 70)
+            return normalized
+        else:
+            print(f"[Google Trends Service] ⚠️  No cached data available")
+            print("=" * 70)
+            print(f"[Google Trends Service] ⚠️  FALLBACK: Using MOCK data")
+            print("=" * 70)
+            return _get_mock_trends_data(query)
+
+    # Step 2: Check cache
+    cached = GoogleTrendsCache.get_cached(query)
+    if cached and cached.is_fresh():
+        age_minutes = (timezone.now() - cached.fetched_at).seconds // 60
+        print(f"[Google Trends Service] 💾 CACHE HIT!")
+        print(f"[Google Trends Service]   Age: {age_minutes} minutes old")
+        print(f"[Google Trends Service]   Using cached Google Trends data")
+        print("=" * 70)
+
+        normalized = _normalize_trends_signals(cached.raw_data)
+        normalized['source'] = 'google_trends'  # Mark as real data (cached)
+        return normalized
+
+    print(f"[Google Trends Service] 💭 Cache miss - fetching fresh data")
+
+    # Step 3: Try real Google Trends
     if _trends_provider.is_available():
         try:
             signals = _trends_provider.get_trend_signals(query)
@@ -54,28 +86,49 @@ def get_trends_data(query: str) -> dict:
             if signals:
                 # Convert to legacy format for compatibility
                 normalized = _normalize_trends_signals(signals)
+
+                # Store in cache
+                GoogleTrendsCache.save_trends_data(query, signals, ttl_hours=24)
+
                 print("=" * 70)
                 print(f"[Google Trends Service] ✅ SUCCESS: Using REAL Google Trends data!")
                 print(f"[Google Trends Service]   Source: pytrends API (live)")
-                print(f"[Google Trends Service]   Provider: {normalized.get('provider')}")
+                print(f"[Google Trends Service]   Cached for 24 hours")
                 print("=" * 70)
                 return normalized
             else:
                 print("=" * 70)
                 print(f"[Google Trends Service] ⚠️  Provider returned None")
                 print(f"[Google Trends Service]   Reason: Likely rate-limited or empty results")
+
+                # Check if it's a rate limit (activate cooldown)
+                # Provider should have logged the error
+                GoogleTrendsCooldown.activate(
+                    reason="Provider returned None (likely HTTP 429)",
+                    duration_minutes=15
+                )
+
                 print("=" * 70)
 
         except Exception as e:
+            error_str = str(e)
             print("=" * 70)
             print(f"[Google Trends Service] ❌ Error with real provider: {e}")
+
+            # Check if it's a rate limit error
+            if "429" in error_str or "Too Many Requests" in error_str:
+                GoogleTrendsCooldown.activate(
+                    reason=f"HTTP 429: {error_str[:100]}",
+                    duration_minutes=20
+                )
+
             print("=" * 70)
     else:
         print("=" * 70)
         print(f"[Google Trends Service] ⚠️  Provider not available")
         print("=" * 70)
 
-    # Fallback to mock data
+    # Step 4: Fallback to mock data
     print("=" * 70)
     print(f"[Google Trends Service] ⚠️  FALLBACK: Using MOCK data")
     print(f"[Google Trends Service]   Source: Deterministic mock generator")
