@@ -174,35 +174,46 @@ if not DEBUG:
 
 
 # Cache configuration
+# TEMPORARY: Redis disabled for debugging 500 error
 # Use Redis for persistent cache (Render, production) or fallback to local memory (local dev)
 REDIS_URL = config('REDIS_URL', default=None)
 
-if REDIS_URL:
-    # Production: Use Redis for persistent cache across workers
-    CACHES = {
-        'default': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': REDIS_URL,
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'SOCKET_CONNECT_TIMEOUT': 5,
-                'SOCKET_TIMEOUT': 5,
-                'CONNECTION_POOL_KWARGS': {
-                    'max_connections': 50,
-                    'retry_on_timeout': True
-                },
-                'PARSER_CLASS': 'redis.connection.HiredisParser',
-            }
-        }
+# TEMPORARY FIX: Force LocMemCache to debug 500 error
+# TODO: Re-enable Redis after identifying the issue
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
-else:
-    # Local development: Use in-memory cache
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
-        }
-    }
+}
+
+# ORIGINAL REDIS CONFIG (COMMENTED OUT FOR DEBUGGING)
+# if REDIS_URL:
+#     # Production: Use Redis for persistent cache across workers
+#     CACHES = {
+#         'default': {
+#             'BACKEND': 'django_redis.cache.RedisCache',
+#             'LOCATION': REDIS_URL,
+#             'OPTIONS': {
+#                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#                 'SOCKET_CONNECT_TIMEOUT': 5,
+#                 'SOCKET_TIMEOUT': 5,
+#                 'CONNECTION_POOL_KWARGS': {
+#                     'max_connections': 50,
+#                     'retry_on_timeout': True
+#                 },
+#                 'PARSER_CLASS': 'redis.connection.HiredisParser',
+#             }
+#         }
+#     }
+# else:
+#     # Local development: Use in-memory cache
+#     CACHES = {
+#         'default': {
+#             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#             'LOCATION': 'unique-snowflake',
+#         }
+#     }
 
 
 # Mercado Livre API Configuration
