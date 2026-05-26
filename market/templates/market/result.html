@@ -803,28 +803,28 @@
                 <small id="rating-required" style="display: none; color: #dc3545; margin-top: 8px; display: block; text-align: center;">
                     Por favor, selecione uma avaliação acima
                 </small>
-
-                <!-- Success Message (hidden initially) -->
-                <div id="feedback-success" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
-                    <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
-                    <h4 style="margin: 0 0 12px 0; font-size: 1.4rem; color: white; font-weight: 600;">Obrigado pelo feedback!</h4>
-                    <p style="margin: 0 0 20px 0; font-size: 1rem; color: rgba(255, 255, 255, 0.95); line-height: 1.6;">
-                        Sua opinião ajuda a melhorar o Radar de Tendências.
-                        <span id="waitlist-message" style="display: none; margin-top: 8px; display: block;">
-                            <br>Você entrou na lista de acesso antecipado.<br>
-                            Entraremos em contato através do seu WhatsApp.
-                        </span>
-                    </p>
-                    <a href="/" style="display: inline-block; background: white; color: #667eea; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s; margin-top: 10px;">
-                        Quero acesso antecipado
-                    </a>
-                </div>
-
-                <!-- Error Message (hidden initially) -->
-                <div id="feedback-error" style="display: none; background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem;">
-                    Erro ao enviar feedback. Tente novamente.
-                </div>
             </form>
+
+            <!-- Success Message (hidden initially) - OUTSIDE form -->
+            <div id="feedback-success" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
+                <div style="font-size: 3rem; margin-bottom: 15px;">🎉</div>
+                <h4 style="margin: 0 0 12px 0; font-size: 1.4rem; color: white; font-weight: 600;">Obrigado pelo feedback!</h4>
+                <p style="margin: 0 0 20px 0; font-size: 1rem; color: rgba(255, 255, 255, 0.95); line-height: 1.6;">
+                    Sua opinião ajuda a melhorar o Radar de Tendências.
+                    <span id="waitlist-message" style="display: none; margin-top: 8px; display: block;">
+                        <br>Você entrou na lista de acesso antecipado.<br>
+                        Entraremos em contato através do seu WhatsApp.
+                    </span>
+                </p>
+                <a href="/" style="display: inline-block; background: white; color: #667eea; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s; margin-top: 10px;">
+                    Quero acesso antecipado
+                </a>
+            </div>
+
+            <!-- Error Message (hidden initially) - OUTSIDE form -->
+            <div id="feedback-error" style="display: none; background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 0.9rem;">
+                Erro ao enviar feedback. Tente novamente.
+            </div>
         </div>
 
         {% if can_analyze_again %}
