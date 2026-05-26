@@ -726,12 +726,9 @@
                 </div>
 
                 <div style="text-align: center;">
-                    <p style="color: rgba(255, 255, 255, 0.95); font-size: 0.95rem; margin-bottom: 15px;">
+                    <p style="color: rgba(255, 255, 255, 0.95); font-size: 0.95rem; margin: 0;">
                         Entre para a lista de espera para receber acesso antecipado.
                     </p>
-                    <a href="/" style="display: inline-block; background: white; color: #667eea; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; transition: all 0.2s;">
-                        Quero acesso antecipado
-                    </a>
                 </div>
             </div>
         </div>
@@ -800,9 +797,12 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary w-100" id="submit-feedback-btn" style="padding: 14px; border-radius: 8px; font-weight: 600; font-size: 1rem; background: #667eea; border: none;" disabled>
+                <button type="submit" class="btn btn-primary w-100" id="submit-feedback-btn" style="padding: 14px; border-radius: 8px; font-weight: 600; font-size: 1rem; background: #667eea; border: none;">
                     Enviar feedback
                 </button>
+                <small id="rating-required" style="display: none; color: #dc3545; margin-top: 8px; display: block; text-align: center;">
+                    Por favor, selecione uma avaliação acima
+                </small>
 
                 <!-- Success Message (hidden initially) -->
                 <div id="feedback-success" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; border-radius: 12px; margin-top: 20px; text-align: center; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);">
@@ -893,9 +893,11 @@
                 // Set rating value
                 ratingInput.value = this.dataset.rating;
 
-                // Enable submit button
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
+                // Hide rating required message if visible
+                const ratingRequired = document.getElementById('rating-required');
+                if (ratingRequired) {
+                    ratingRequired.style.display = 'none';
+                }
             });
 
             btn.addEventListener('mouseenter', function() {
@@ -914,6 +916,22 @@
         // Form submission
         feedbackForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            console.log('Form submitted');
+
+            // Check if rating is selected
+            const ratingRequired = document.getElementById('rating-required');
+            if (!ratingInput.value) {
+                console.log('No rating selected');
+                if (ratingRequired) {
+                    ratingRequired.style.display = 'block';
+                }
+                return;
+            }
+
+            // Hide rating required message
+            if (ratingRequired) {
+                ratingRequired.style.display = 'none';
+            }
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Enviando...';
@@ -929,14 +947,21 @@
                     }
                 });
 
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Response data:', data);
 
                 if (data.success) {
+                    console.log('Success! Hiding form and showing success message');
+
                     // Hide form
                     feedbackForm.style.display = 'none';
 
                     // Show success message
                     feedbackSuccess.style.display = 'block';
+
+                    // Scroll to success message
+                    feedbackSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
                     // Show waitlist message if checkbox was checked
                     if (enteredWaitlistCheckbox && enteredWaitlistCheckbox.checked) {
@@ -946,13 +971,16 @@
                         }
                     }
                 } else {
+                    console.error('Error from server:', data.error);
                     feedbackError.style.display = 'block';
                     feedbackError.textContent = data.error || 'Erro ao enviar feedback';
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Enviar feedback';
                 }
             } catch (error) {
+                console.error('Fetch error:', error);
                 feedbackError.style.display = 'block';
+                feedbackError.textContent = 'Erro ao enviar feedback. Tente novamente.';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Enviar feedback';
             }
