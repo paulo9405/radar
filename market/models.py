@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
 
 
 class ProductSearch(models.Model):
@@ -94,3 +96,90 @@ class MarketAnalysis(models.Model):
             'excellent': 'success',
         }
         return colors.get(self.classification, 'secondary')
+
+
+class MercadoLivreToken(models.Model):
+    """
+    Stores Mercado Livre OAuth tokens.
+
+    Uses singleton approach - only one active token record exists (id=1).
+    Tokens are persistent integration state, not cache data.
+    """
+    access_token = models.TextField()
+    refresh_token = models.TextField()
+    token_type = models.CharField(max_length=50, blank=True, default='Bearer')
+    expires_at = models.DateTimeField()
+    scope = models.TextField(blank=True, default='')
+    user_id_ml = models.CharField(max_length=100, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Mercado Livre Token'
+        verbose_name_plural = 'Mercado Livre Tokens'
+
+    def __str__(self):
+        status = "Valid" if not self.is_expired() else "Expired"
+        return f"ML Token ({status}) - Expires: {self.expires_at.strftime('%Y-%m-%d %H:%M')}"
+
+    def is_expired(self):
+        """Check if access token is expired"""
+        return timezone.now() >= self.expires_at
+
+    def masked_access_token(self):
+        """Returns masked access token for display"""
+        if len(self.access_token) > 10:
+            return f"{self.access_token[:6]}...{self.access_token[-4:]}"
+        return "***"
+
+    def masked_refresh_token(self):
+        """Returns masked refresh token for display"""
+        if len(self.refresh_token) > 10:
+            return f"{self.refresh_token[:6]}...{self.refresh_token[-4:]}"
+        return "***"
+
+    @classmethod
+    def get_current(cls):
+        """Get the current active token (singleton pattern)"""
+        try:
+            return cls.objects.get(id=1)
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def save_token_data(cls, token_data):
+        """
+        Save or update token data from OAuth response.
+
+        Args:
+            token_data: Dict with keys: access_token, refresh_token,
+                       expires_in, token_type, scope, user_id (optional)
+
+        Returns:
+            MercadoLivreToken: The saved token instance
+        """
+        # Calculate expires_at from expires_in (seconds)
+        expires_in = token_data.get('expires_in', 21600)  # Default 6 hours
+        expires_at = timezone.now() + timedelta(seconds=expires_in)
+
+        # Prepare data
+        data = {
+            'access_token': token_data.get('access_token', ''),
+            'refresh_token': token_data.get('refresh_token', ''),
+            'token_type': token_data.get('token_type', 'Bearer'),
+            'expires_at': expires_at,
+            'scope': token_data.get('scope', ''),
+            'user_id_ml': token_data.get('user_id'),
+        }
+
+        # Use update_or_create with id=1 (singleton)
+        token, created = cls.objects.update_or_create(
+            id=1,
+            defaults=data
+        )
+
+        action = "created" if created else "updated"
+        print(f"[ML Token] Token {action} in database - Expires at: {expires_at}")
+
+        return token

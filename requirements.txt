@@ -16,8 +16,3 @@ python-decouple==3.8
 
 # HTTP requests for API integration
 requests==2.31.0
-
-# Redis cache for persistent OAuth tokens (production)
-django-redis==5.4.0
-redis==5.0.1
-hiredis==2.2.3

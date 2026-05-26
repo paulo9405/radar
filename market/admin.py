@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ProductSearch, MarketAnalysis
+from .models import ProductSearch, MarketAnalysis, MercadoLivreToken
 
 
 @admin.register(ProductSearch)
@@ -76,3 +76,50 @@ class MarketAnalysisAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         """Prevent manual creation of analyses through admin"""
         return False
+
+
+@admin.register(MercadoLivreToken)
+class MercadoLivreTokenAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for MercadoLivreToken model.
+
+    IMPORTANT: Tokens are masked for security - full tokens are never displayed.
+    """
+    list_display = [
+        'id',
+        'token_status',
+        'masked_access_token',
+        'expires_at',
+        'user_id_ml',
+        'updated_at'
+    ]
+    readonly_fields = [
+        'id',
+        'masked_access_token',
+        'masked_refresh_token',
+        'token_type',
+        'expires_at',
+        'scope',
+        'user_id_ml',
+        'created_at',
+        'updated_at',
+        'token_status'
+    ]
+
+    # Hide actual token fields from admin form
+    exclude = ['access_token', 'refresh_token']
+
+    def token_status(self, obj):
+        """Display token status with icon"""
+        if obj.is_expired():
+            return "🔴 Expired"
+        return "🟢 Valid"
+    token_status.short_description = 'Status'
+
+    def has_add_permission(self, request):
+        """Prevent manual creation - tokens come from OAuth flow only"""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Allow deletion to reset OAuth"""
+        return True

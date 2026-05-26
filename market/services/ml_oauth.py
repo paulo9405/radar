@@ -3,11 +3,11 @@ Mercado Livre OAuth handler.
 
 Manages OAuth flow and token storage for Mercado Livre API access.
 Uses PKCE (Proof Key for Code Exchange) for enhanced security.
+Tokens are stored in PostgreSQL database, not cache.
 """
 import requests
 from django.conf import settings
 from django.core.cache import cache
-import time
 import secrets
 import hashlib
 import base64
@@ -78,6 +78,7 @@ def _generate_code_challenge(code_verifier: str) -> str:
 def exchange_code_for_token(code: str) -> dict:
     """
     Exchanges authorization code for access token using PKCE.
+    Saves token to database for persistence.
 
     Args:
         code: Authorization code from OAuth callback
@@ -85,9 +86,11 @@ def exchange_code_for_token(code: str) -> dict:
     Returns:
         dict: Token response with access_token, refresh_token, etc.
     """
+    from market.models import MercadoLivreToken
+
     url = "https://api.mercadolibre.com/oauth/token"
 
-    # Get stored code_verifier
+    # Get stored code_verifier from cache (only used during OAuth flow)
     code_verifier = cache.get('ml_code_verifier')
 
     if not code_verifier:
@@ -116,12 +119,10 @@ def exchange_code_for_token(code: str) -> dict:
         if response.status_code == 200:
             token_data = response.json()
 
-            # Store token in cache (expires in ~6 hours typically)
-            cache.set('ml_access_token', token_data.get('access_token'), timeout=21000)  # 5h50m
-            cache.set('ml_refresh_token', token_data.get('refresh_token'), timeout=15552000)  # 180 days
-            cache.set('ml_token_timestamp', int(time.time()))
+            # Save token to database (persistent storage)
+            MercadoLivreToken.save_token_data(token_data)
 
-            print(f"[ML OAuth] ✅ Token exchange successful!")
+            print(f"[ML OAuth] ✅ Token exchange successful! Token saved to database.")
             return token_data
         else:
             print(f"[ML OAuth] ❌ Token exchange failed: {response.status_code}")
@@ -135,30 +136,39 @@ def exchange_code_for_token(code: str) -> dict:
 
 def get_valid_token() -> str:
     """
-    Gets a valid access token, refreshing if necessary.
+    Gets a valid access token from database, refreshing if necessary.
 
     Returns:
         str: Valid access token or empty string if unavailable
     """
-    # Check if we have a cached token
-    access_token = cache.get('ml_access_token')
+    from market.models import MercadoLivreToken
 
-    if access_token:
-        return access_token
+    # Load token from database
+    token_record = MercadoLivreToken.get_current()
 
-    # Try to refresh token
-    refresh_token = cache.get('ml_refresh_token')
+    if not token_record:
+        print("[ML OAuth] No token found in database")
+        return ""
 
-    if refresh_token:
-        return _refresh_access_token(refresh_token)
+    # Check if token is still valid
+    if not token_record.is_expired():
+        print("[ML OAuth] ✅ Valid token loaded from database")
+        return token_record.access_token
 
-    # No token available
+    # Token expired - try to refresh
+    print("[ML OAuth] Token expired, attempting refresh...")
+    if token_record.refresh_token:
+        return _refresh_access_token(token_record.refresh_token)
+
+    # No valid token available
+    print("[ML OAuth] ❌ No valid token available")
     return ""
 
 
 def _refresh_access_token(refresh_token: str) -> str:
     """
     Refreshes the access token using refresh token.
+    Saves updated token to database.
 
     Args:
         refresh_token: Refresh token
@@ -166,6 +176,8 @@ def _refresh_access_token(refresh_token: str) -> str:
     Returns:
         str: New access token or empty string if failed
     """
+    from market.models import MercadoLivreToken
+
     url = "https://api.mercadolibre.com/oauth/token"
 
     data = {
@@ -187,14 +199,14 @@ def _refresh_access_token(refresh_token: str) -> str:
         if response.status_code == 200:
             token_data = response.json()
 
-            # Update cached token
-            new_access_token = token_data.get('access_token')
-            cache.set('ml_access_token', new_access_token, timeout=21000)
-            cache.set('ml_token_timestamp', int(time.time()))
+            # Save updated token to database
+            MercadoLivreToken.save_token_data(token_data)
 
+            new_access_token = token_data.get('access_token')
+            print(f"[ML OAuth] ✅ Token refreshed successfully and saved to database")
             return new_access_token
         else:
-            print(f"[ML OAuth] Token refresh failed: {response.status_code}")
+            print(f"[ML OAuth] ❌ Token refresh failed: {response.status_code}")
             return ""
 
     except Exception as e:
@@ -204,9 +216,10 @@ def _refresh_access_token(refresh_token: str) -> str:
 
 def is_authorized() -> bool:
     """
-    Checks if we have valid OAuth authorization.
+    Checks if we have valid OAuth authorization in database.
 
     Returns:
         bool: True if we have a valid access token
     """
-    return bool(get_valid_token())
+    token = get_valid_token()
+    return bool(token)
