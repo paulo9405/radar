@@ -38,8 +38,8 @@ def get_marketplace_data(query: str) -> dict:
     """
     Fetches marketplace data for a given product query.
 
-    Uses public Mercado Livre search API (no authentication required).
-    Falls back to deterministic mock data if request fails.
+    Mercado Livre search API requires OAuth authentication.
+    Uses authenticated request if token is available, otherwise mock data.
 
     Args:
         query: Product search query
@@ -57,17 +57,26 @@ def get_marketplace_data(query: str) -> dict:
             - source: 'mercado_livre_api' or 'mock_fallback'
             - error: Error message if fallback (optional)
     """
-    # Use public search endpoint (no auth required)
-    try:
-        api_data = _fetch_from_public_api(query)
-        if api_data:
-            return api_data
-    except Exception as e:
-        # Log error but don't crash - fall back to mock
-        print(f"[ML API] Exception: {str(e)}")
+    print(f"[ML API] Starting marketplace data fetch for: {query}")
+
+    # Mercado Livre requires OAuth authentication for search endpoint
+    if is_authorized():
+        try:
+            print("[ML API] Using authenticated API request (OAuth token available)...")
+            api_data = _fetch_with_auth(query)
+            if api_data:
+                print("[ML API] ✅ Authenticated API request successful!")
+                return api_data
+        except Exception as e:
+            print(f"[ML API] Authenticated API exception: {str(e)}")
+    else:
+        print("[ML API] ⚠️  No OAuth token - API requires authentication")
+        print("[ML API] Authorize at: /market/mercadolivre/authorize/")
 
     # Fallback to mock data
-    return _get_mock_data(query, fallback=True, error="API request failed")
+    error_msg = "OAuth required" if is_configured() else "API not configured"
+    print(f"[ML API] ❌ Using mock fallback: {error_msg}")
+    return _get_mock_data(query, fallback=True, error=error_msg)
 
 
 def _fetch_from_public_api(query: str, limit: int = 50) -> Optional[dict]:
@@ -94,21 +103,29 @@ def _fetch_from_public_api(query: str, limit: int = 50) -> Optional[dict]:
         'User-Agent': 'RadarTendencias/1.0'
     }
 
-    print(f"[ML API] Public search request: q={query}, limit={limit}")
+    # Build full URL for logging
+    param_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+    full_url = f"{url}?{param_string}"
+
+    print(f"[ML API] PUBLIC REQUEST")
+    print(f"[ML API]   URL: {full_url}")
+    print(f"[ML API]   Headers: {headers}")
 
     try:
         # Make request with timeout
         response = requests.get(url, params=params, headers=headers, timeout=10)
 
-        # Log status
-        print(f"[ML API] Status: {response.status_code}")
+        # Log full response details
+        print(f"[ML API] Response Status: {response.status_code}")
+        print(f"[ML API] Response Headers: {dict(response.headers)}")
 
         # Check status
         if response.status_code != 200:
-            # Log failure details
-            body_preview = response.text[:300] if response.text else "empty"
-            print(f"[ML API] Public search failed: status={response.status_code}")
-            print(f"[ML API] Response preview: {body_preview}")
+            # Log full failure details
+            body_preview = response.text[:500] if response.text else "empty"
+            print(f"[ML API] ❌ PUBLIC REQUEST FAILED")
+            print(f"[ML API] Status: {response.status_code}")
+            print(f"[ML API] Response body: {body_preview}")
             return None
 
         # Parse JSON
@@ -117,13 +134,93 @@ def _fetch_from_public_api(query: str, limit: int = 50) -> Optional[dict]:
         # Log success
         results_count = len(data.get('results', []))
         total_results = data.get('paging', {}).get('total', 0)
-        print(f"[ML API] ✅ Results found: {results_count} items, {total_results} total")
+        print(f"[ML API] ✅ PUBLIC REQUEST SUCCESS")
+        print(f"[ML API] Results: {results_count} items fetched, {total_results} total available")
 
         # Normalize and return
         return _normalize_api_response(data, query)
 
     except requests.exceptions.Timeout:
-        print("[ML API] ❌ Request timeout")
+        print("[ML API] ❌ Request timeout (10 seconds)")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"[ML API] ❌ Request error: {e}")
+        return None
+    except (KeyError, ValueError) as e:
+        print(f"[ML API] ❌ Parse error: {e}")
+        return None
+
+
+def _fetch_with_auth(query: str, limit: int = 50) -> Optional[dict]:
+    """
+    Fetches data from Mercado Livre API with OAuth authentication.
+
+    Args:
+        query: Search query
+        limit: Max results to fetch (default 50)
+
+    Returns:
+        dict: Normalized marketplace data or None if failed
+    """
+    # Get valid access token
+    access_token = ml_oauth.get_valid_token()
+
+    if not access_token:
+        print("[ML API] No valid OAuth token available")
+        return None
+
+    # Mercado Livre API search endpoint
+    url = "https://api.mercadolibre.com/sites/MLB/search"
+
+    params = {
+        'q': query,
+        'limit': limit
+    }
+
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Accept': 'application/json',
+        'User-Agent': 'RadarTendencias/1.0'
+    }
+
+    # Build full URL for logging (without exposing full token)
+    param_string = '&'.join([f"{k}={v}" for k, v in params.items()])
+    full_url = f"{url}?{param_string}"
+
+    print(f"[ML API] AUTHENTICATED REQUEST")
+    print(f"[ML API]   URL: {full_url}")
+    print(f"[ML API]   Authorization: Bearer {access_token[:10]}...")
+
+    try:
+        # Make request with timeout
+        response = requests.get(url, params=params, headers=headers, timeout=10)
+
+        # Log response details
+        print(f"[ML API] Response Status: {response.status_code}")
+
+        # Check status
+        if response.status_code != 200:
+            # Log failure details
+            body_preview = response.text[:500] if response.text else "empty"
+            print(f"[ML API] ❌ AUTHENTICATED REQUEST FAILED")
+            print(f"[ML API] Status: {response.status_code}")
+            print(f"[ML API] Response body: {body_preview}")
+            return None
+
+        # Parse JSON
+        data = response.json()
+
+        # Log success
+        results_count = len(data.get('results', []))
+        total_results = data.get('paging', {}).get('total', 0)
+        print(f"[ML API] ✅ AUTHENTICATED REQUEST SUCCESS")
+        print(f"[ML API] Results: {results_count} items fetched, {total_results} total available")
+
+        # Normalize and return
+        return _normalize_api_response(data, query)
+
+    except requests.exceptions.Timeout:
+        print("[ML API] ❌ Request timeout (10 seconds)")
         return None
     except requests.exceptions.RequestException as e:
         print(f"[ML API] ❌ Request error: {e}")
