@@ -69,12 +69,18 @@ def test_analysis(request):
             raw_data=analysis_result['raw_data']
         )
 
+        # Check if user can do another analysis
+        can_analyze_again = False
+        if whatsapp_lead and not whatsapp_lead.has_used_free_test:
+            can_analyze_again = True
+
         # Pass data to template
         context = {
             'query': query,
             'analysis': analysis_result,
             'search_id': product_search.id,
             'whatsapp_lead': whatsapp_lead,  # For feedback form
+            'can_analyze_again': can_analyze_again,  # Block "Nova Análise" if test used
         }
 
         return render(request, 'market/result.html', context)

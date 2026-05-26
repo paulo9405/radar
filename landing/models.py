@@ -92,7 +92,10 @@ class WhatsAppLead(models.Model):
         validators=[whatsapp_regex],
         max_length=20,
         verbose_name='WhatsApp',
-        unique=True
+        unique=True,
+        error_messages={
+            'unique': 'Esse WhatsApp já utilizou a análise gratuita.'
+        }
     )
 
     normalized_whatsapp = models.CharField(

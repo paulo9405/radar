@@ -33,28 +33,41 @@ def index(request):
             whatsapp = form.cleaned_data['whatsapp']
             normalized = WhatsAppLead.normalize_whatsapp(whatsapp)
 
-            # Check if this WhatsApp already used free test
-            if WhatsAppLead.has_used_test(whatsapp):
-                messages.warning(
-                    request,
-                    'Este WhatsApp já foi usado para uma análise grátis. '
-                    'Quer acesso ilimitado? Cadastre-se na lista de espera!'
-                )
-                # Stay on landing page, show waitlist CTA
-                return render(request, 'landing/index.html', {
-                    'form': form,
-                    'show_waitlist': True
-                })
+            # Check if WhatsApp already exists (any previous submission)
+            existing_lead = WhatsAppLead.objects.filter(normalized_whatsapp=normalized).first()
 
-            # Create or get WhatsAppLead
-            lead, created = WhatsAppLead.objects.get_or_create(
-                normalized_whatsapp=normalized,
-                defaults={
-                    'whatsapp': whatsapp,
-                    'ip_address': get_client_ip(request),
-                    'session_key': request.session.session_key or ''
-                }
-            )
+            if existing_lead:
+                # Check if already used free test
+                if existing_lead.has_used_free_test:
+                    messages.error(
+                        request,
+                        'Esse WhatsApp já utilizou a análise gratuita. Em breve liberaremos novos acessos.'
+                    )
+                    return render(request, 'landing/index.html', {
+                        'form': WhatsAppLeadForm(initial={'whatsapp': whatsapp}),
+                        'scroll_to_form': True
+                    })
+                else:
+                    # WhatsApp exists but hasn't used test yet - allow
+                    lead = existing_lead
+            else:
+                # Create new WhatsAppLead
+                try:
+                    lead = WhatsAppLead.objects.create(
+                        whatsapp=whatsapp,
+                        normalized_whatsapp=normalized,
+                        ip_address=get_client_ip(request),
+                        session_key=request.session.session_key or ''
+                    )
+                except Exception as e:
+                    messages.error(
+                        request,
+                        'Esse WhatsApp já utilizou a análise gratuita. Em breve liberaremos novos acessos.'
+                    )
+                    return render(request, 'landing/index.html', {
+                        'form': WhatsAppLeadForm(initial={'whatsapp': whatsapp}),
+                        'scroll_to_form': True
+                    })
 
             # Store in session for analysis page
             request.session['whatsapp_lead_id'] = lead.id
@@ -63,7 +76,7 @@ def index(request):
             # Immediate redirect to analysis page
             messages.success(
                 request,
-                '✅ Análise grátis desbloqueada! Digite o produto que quer analisar.'
+                '✅ Sua análise grátis foi liberada! Digite o produto que quer analisar.'
             )
             return redirect('market:test')
 

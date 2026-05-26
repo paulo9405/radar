@@ -123,11 +123,11 @@
                     <div class="form-header-conversion text-center">
                         <div class="form-badge-conversion">
                             <i class="bi bi-gift-fill"></i>
-                            Análise Grátis
+                            1 Análise Grátis por WhatsApp
                         </div>
-                        <h2 class="form-title-conversion">Digite seu WhatsApp para liberar análise grátis</h2>
+                        <h2 class="form-title-conversion">Digite seu WhatsApp para liberar sua única análise gratuita</h2>
                         <p class="form-subtitle-conversion">
-                            Descubra agora se um produto vale a pena. Sem cadastro, sem espera.
+                            Cada número pode fazer 1 teste gratuito. Resultado instantâneo.
                         </p>
                     </div>
 
@@ -150,7 +150,7 @@
                             <div class="mb-4">
                                 <label for="{{ form.whatsapp.id_for_label }}" class="form-label">Seu WhatsApp</label>
                                 {{ form.whatsapp }}
-                                <small class="form-text">Para liberar a análise grátis</small>
+                                <small class="form-text">Cada número pode fazer 1 teste gratuito</small>
                                 {% if form.whatsapp.errors %}
                                     <div class="invalid-feedback d-block">
                                         {{ form.whatsapp.errors }}
@@ -159,7 +159,7 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary btn-lg w-100 submit-button-conversion">
-                                <span class="button-text">Fazer 1 Análise Grátis</span>
+                                <span class="button-text">Liberar minha análise grátis</span>
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </button>
                         </form>
@@ -335,5 +335,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
     <script src="{% static 'landing/js/main.js' %}"></script>
+
+    {% if scroll_to_form %}
+    <script>
+        // Scroll to form when there's an error
+        document.addEventListener('DOMContentLoaded', function() {
+            const formSection = document.getElementById('form');
+            if (formSection) {
+                formSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+    {% endif %}
 </body>
 </html>

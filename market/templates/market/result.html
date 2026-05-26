@@ -165,6 +165,69 @@
             background: #fff3cd;
             color: #856404;
         }
+
+        /* Mobile Responsiveness - Compact Cards */
+        @media (max-width: 768px) {
+            .result-container {
+                padding: 0 15px;
+            }
+
+            .header {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.3rem;
+            }
+
+            .score-card {
+                padding: 20px;
+                margin-bottom: 15px;
+            }
+
+            .final-score {
+                padding: 20px;
+            }
+
+            .final-score .score-number {
+                font-size: 3rem;
+            }
+
+            .final-score .classification {
+                font-size: 1.2rem;
+            }
+
+            .individual-scores {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .score-item {
+                padding: 12px;
+            }
+
+            .score-item .value {
+                font-size: 1.5rem;
+            }
+
+            .summary-box {
+                padding: 15px;
+                margin-top: 15px;
+                font-size: 0.95rem;
+            }
+
+            .locked-features, .cta-box {
+                padding: 20px;
+                margin-top: 15px;
+            }
+
+            .btn-new-search {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -368,8 +431,7 @@
         </div>
         {% endif %}
 
-        <!-- Feedback Section -->
-        {% if whatsapp_lead %}
+        <!-- Feedback Section - ALWAYS SHOW -->
         <div class="score-card" id="feedback-section">
             <h3 style="margin-bottom: 20px;">💬 O que você achou desta análise?</h3>
             <p class="text-muted" style="margin-bottom: 20px;">
@@ -378,7 +440,7 @@
 
             <form id="feedback-form">
                 {% csrf_token %}
-                <input type="hidden" name="whatsapp_lead_id" value="{{ whatsapp_lead.id }}">
+                <input type="hidden" name="whatsapp_lead_id" value="{{ whatsapp_lead.id|default:'' }}">
                 <input type="hidden" name="product_query" value="{{ query }}">
                 <input type="hidden" name="rating" id="rating-input">
 
@@ -445,28 +507,36 @@
 
             <!-- Final CTA (shown after feedback) -->
             <div id="final-cta" style="display: none; margin-top: 30px; padding: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; text-align: center; color: white;">
-                <h3 style="margin-bottom: 15px; color: white;">🚀 Quer acesso ilimitado quando lançarmos?</h3>
+                <h3 style="margin-bottom: 15px; color: white;">🎯 Quer receber acesso completo quando lançarmos?</h3>
                 <p style="margin-bottom: 20px; opacity: 0.9;">
-                    Entre na lista de espera e seja um dos primeiros a ter acesso completo
+                    Entre na lista para receber mais análises e recursos exclusivos
                 </p>
                 <a href="/" class="btn btn-unlock" style="background: white; color: #667eea; text-decoration: none; display: inline-block;">
                     Entrar na Lista de Espera
                 </a>
             </div>
         </div>
-        {% endif %}
 
+        {% if can_analyze_again %}
         <div class="text-center">
             <a href="{% url 'market:test' %}" class="btn-new-search">
                 ← Nova Análise
             </a>
         </div>
+        {% else %}
+        <div class="text-center">
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 20px;">
+                Você já utilizou sua análise gratuita.
+                <a href="/" style="color: #00d4ff; text-decoration: none;">Entre na lista de espera</a> para receber mais acessos.
+            </p>
+        </div>
+        {% endif %}
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Feedback form handling
+        // Feedback form handling - Check if elements exist first
         const ratingButtons = document.querySelectorAll('.rating-btn');
         const ratingInput = document.getElementById('rating-input');
         const submitBtn = document.getElementById('submit-feedback-btn');
@@ -474,6 +544,11 @@
         const feedbackSuccess = document.getElementById('feedback-success');
         const feedbackError = document.getElementById('feedback-error');
         const finalCta = document.getElementById('final-cta');
+
+        // Only run if feedback form exists
+        if (!feedbackForm || !submitBtn || !ratingInput) {
+            console.log('Feedback form not found on this page');
+        } else {
 
         // Rating button styles
         const ratingBtnStyle = `
@@ -571,6 +646,8 @@
                 submitBtn.textContent = 'Enviar Feedback';
             }
         });
+
+        } // End of feedback form check
     </script>
 </body>
 </html>
