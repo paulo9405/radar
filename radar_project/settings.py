@@ -173,6 +173,38 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
 
 
+# Cache configuration
+# Use Redis for persistent cache (Render, production) or fallback to local memory (local dev)
+REDIS_URL = config('REDIS_URL', default=None)
+
+if REDIS_URL:
+    # Production: Use Redis for persistent cache across workers
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'SOCKET_CONNECT_TIMEOUT': 5,
+                'SOCKET_TIMEOUT': 5,
+                'CONNECTION_POOL_KWARGS': {
+                    'max_connections': 50,
+                    'retry_on_timeout': True
+                },
+                'PARSER_CLASS': 'redis.connection.HiredisParser',
+            }
+        }
+    }
+else:
+    # Local development: Use in-memory cache
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
+
+
 # Mercado Livre API Configuration
 # These credentials should ONLY be stored in .env file
 # Never commit credentials to version control
