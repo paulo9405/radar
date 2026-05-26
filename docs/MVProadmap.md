@@ -2,7 +2,7 @@
 
 ## Objetivo do Projeto
 
-Criar uma plataforma SaaS que utiliza sinais públicos de mercado para ajudar vendedores a identificar:
+Criar uma plataforma SaaS que utiliza **múltiplas fontes de inteligência de mercado** para ajudar vendedores a identificar:
 
 * produtos com potencial;
 * tendência de crescimento;
@@ -14,11 +14,11 @@ O foco NÃO é prever o futuro.
 
 O foco é:
 
-> reduzir decisões ruins usando dados públicos de mercado.
+> **Reduzir decisões ruins usando dados públicos agregados de múltiplas fontes.**
 
 ---
 
-# FASE 0 — Validação de Interesse (CONCLUÍDA)
+# FASE 0 — Validação de Interesse (✅ CONCLUÍDA)
 
 ## Objetivo
 
@@ -51,404 +51,575 @@ Validar:
 
 ---
 
-# FASE 1 — MVP Funcional (PRIORIDADE MÁXIMA)
+# FASE 1 — MVP Funcional (✅ PARCIALMENTE CONCLUÍDA)
 
-## Objetivo
+## Status Atual
 
-Entregar um sistema REAL e funcional o mais rápido possível.
+### ✅ Infraestrutura Completa
 
-Sem IA complexa.
+* Django project structure
+* PostgreSQL database
+* Deployment on Render
+* Environment configuration
+* Zero 500 errors architecture
 
-Sem automações gigantes.
+### ✅ Apps Django
 
-Sem promessas irreais.
+* **Landing app**: Landing page funcional
+* **Market app**: Sistema de análise de produtos
 
----
+### ✅ Sistema de Análise
 
-# Stack Recomendada
+* Pesquisa de produtos
+* Algoritmo de scoring (Demanda 35%, Concorrência 30%, Saturação 20%, Preço 15%)
+* Classificação de oportunidades (bad, risky, good, excellent)
+* Resumo inteligente com IA
+* Interface de resultados
+* Histórico de buscas no banco
 
-## Backend
+### ✅ Mercado Livre Integration (OAuth Complete)
 
-* Django
-* Django REST Framework
+* OAuth 2.0 flow implementado
+* PKCE (Proof Key for Code Exchange) security
+* Token persistence em PostgreSQL (`MercadoLivreToken` model)
+* Automatic token refresh
+* Authenticated API requests
+* Admin interface com masked tokens
+* Complete debugging infrastructure
 
-## Frontend
+**Status:** OAuth funciona perfeitamente. Token persistence funciona. API communication funciona.
 
-* Django Templates inicialmente
-  OU
-* React futuramente
+**Limitação descoberta:** Mercado Livre endpoint bloqueado por policy (`PA_UNAUTHORIZED_RESULT_FROM_POLICIES`)
 
-## Banco
+Veja: `docs/mercado_livre_policy_block.md`
 
-* PostgreSQL
+### ✅ Provider System Architecture
 
-## Infra
+* Mock data provider (deterministic, baseado em hash)
+* Graceful fallback system
+* Provider status badges
+* Comprehensive logging
+* Debug management command (`python manage.py test_ml_api`)
 
-* Render / Railway / VPS simples inicialmente
+### ✅ Database Models
 
----
+```python
+class ProductSearch(models.Model):
+    query, source, is_public_test, ip_address, user, created_at
 
-# Funcionalidades do MVP
+class MarketAnalysis(models.Model):
+    demand_score, competition_score, saturation_score, price_score
+    final_score, classification, confidence_level
+    summary, raw_data
 
-## 1. Pesquisa de Produto
+class MercadoLivreToken(models.Model):
+    access_token, refresh_token, expires_at
+    token_type, scope, user_id_ml
+```
 
-Usuário digita:
+### ✅ Django Admin
 
-* nome do produto;
-* nicho;
-* palavra-chave.
-
-Ex:
-
-* “Luminária Sunset”
-* “Mini impressora térmica”
-* “Projetor portátil”
-
----
-
-## 2. Coleta de Dados
-
-# FONTES PRINCIPAIS
-
----
-
-## Mercado Livre API (PRINCIPAL)
-
-### Objetivo
-
-Coletar:
-
-* quantidade de anúncios;
-* faixa de preço;
-* vendedores;
-* avaliações;
-* concorrência;
-* saturação.
-
-### Método
-
-API oficial do Mercado Livre.
-
-### Necessário
-
-* criar aplicação developer;
-* client id;
-* client secret;
-* token OAuth.
-
-### Vantagem
-
-Melhor fonte para MVP no Brasil.
+* ProductSearch admin
+* MarketAnalysis admin (read-only)
+* MercadoLivreToken admin (masked security)
 
 ---
 
-## Google Trends
+## Lições Aprendidas: Mercado Livre API
 
-### Objetivo
+### O Que Funciona
 
-Medir:
+✅ OAuth authentication
+✅ Token persistence (PostgreSQL)
+✅ Token refresh logic
+✅ API communication
+✅ Request/response handling
 
-* crescimento de busca;
-* interesse ao longo do tempo;
-* sazonalidade.
+### Bloqueio por Policy
 
-### Método inicial
+❌ Mercado Livre search endpoint retorna:
 
-* pytrends
-  OU
-* SerpAPI/DataForSEO.
+```json
+{
+  "error": "PA_UNAUTHORIZED_RESULT_FROM_POLICIES",
+  "message": "forbidden",
+  "status": 403
+}
+```
 
-### Futuramente
+**Causa provável:**
+* App developer novo não revisado
+* Endpoint de marketplace discovery restrito
+* Políticas anti-abuso
+* Falta de aprovação comercial
+* Restrições de descoberta de produtos
 
-Migrar para API oficial do Google Trends quando estável/publicamente disponível.
+**Importante:** Isso NÃO é falha técnica. É limitação de permissão da plataforma.
+
+### Conclusão Estratégica
+
+**Dependência de um único provider é arriscada.**
+
+Mercado Livre pode:
+* Mudar políticas
+* Bloquear endpoints
+* Aumentar custos
+* Restringir acesso
+
+**Solução:** Arquitetura multi-provider desde o MVP.
+
+---
+
+# NOVA ARQUITETURA: Multi-Provider Intelligence Engine
+
+## Visão Estratégica
+
+Radar de Tendências evolui de:
+
+> "Ferramenta de análise do Mercado Livre"
+
+Para:
+
+> **"Engine de inteligência de mercado multi-fonte com agregação de sinais e scoring proprietário."**
+
+## Vantagens
+
+✅ **Resiliência:** Falha de um provider não derruba o sistema
+✅ **Qualidade:** Múltiplos sinais = análise mais robusta
+✅ **Escalabilidade:** Adicionar novos providers é modular
+✅ **Competitividade:** Dados exclusivos de múltiplas fontes
+✅ **Independência:** Não depende de aprovação de uma única plataforma
+
+---
+
+# Provider Architecture
+
+Veja documentação completa: `docs/provider_architecture.md`
+
+## Provider Abstraction Layer
+
+```python
+class BaseProvider:
+    def get_marketplace_data(query) -> dict
+    def is_available() -> bool
+    def get_status() -> str
+
+class MercadoLivreProvider(BaseProvider):
+    # OAuth-based when available
+
+class GoogleTrendsProvider(BaseProvider):
+    # pytrends integration
+
+class SerpProvider(BaseProvider):
+    # SerpAPI/DataForSEO
+
+class MockProvider(BaseProvider):
+    # Fallback determinístico
+```
+
+## Aggregation Layer
+
+```python
+class MarketIntelligence:
+    providers = [
+        MercadoLivreProvider(),
+        GoogleTrendsProvider(),
+        SerpProvider(),
+        MockProvider()  # Always available fallback
+    ]
+
+    def analyze_product(query):
+        signals = aggregate_signals(query)
+        scores = calculate_scores(signals)
+        classification = classify_opportunity(scores)
+        summary = generate_summary(signals, scores)
+        return analysis
+```
+
+---
+
+# Próximas Fases — Atualizado
+
+## FASE 1.5 — Stabilize Current MVP (🔄 EM ANDAMENTO)
+
+**Objetivo:** Sistema robusto e funcional mesmo sem providers externos.
+
+### Tarefas
+
+* ✅ Mock data system funcionando
+* ✅ Provider fallback logic
+* ✅ Zero 500 errors
+* 🔄 Improve UI/UX
+* 🔄 Better error messages
+* 🔄 Provider status indicators
+* 🔄 Mock data quality improvements
+
+**Prazo:** 1 semana
+
+---
+
+## FASE 2 — Google Trends Integration (📋 PRÓXIMO)
+
+**Objetivo:** Primeira fonte real de dados independente de marketplaces.
+
+### Implementação
+
+```python
+# market/services/google_trends.py
+
+import pytrends
+from pytrends.request import TrendReq
+
+class GoogleTrendsProvider:
+    def get_trends_data(query):
+        # Historical trend
+        # Growth indicators
+        # Related queries
+        # Regional interest
+        # Momentum scoring
+```
 
 ### Métricas
 
-* crescimento 30 dias;
-* crescimento 90 dias;
-* estabilidade;
-* tendência.
+* Crescimento 30 dias
+* Crescimento 90 dias
+* Tendência de alta/baixa
+* Interesse regional
+* Queries relacionadas
+
+### Scoring
+
+* Tendência crescente → +3 pontos
+* Tendência estável → 0 pontos
+* Tendência decrescente → -3 pontos
+
+**Prazo:** 1-2 semanas
 
 ---
 
-## Google Search / Shopping
+## FASE 3 — SERP & Search Intelligence (📋 PLANEJADO)
 
-### Objetivo
+**Objetivo:** Adicionar sinais de search volume, shopping signals, keyword data.
 
-Medir:
+### Providers
 
-* presença do produto;
-* força competitiva;
-* sinais externos;
-* marketplaces adicionais.
+**SerpAPI:** https://serpapi.com/
+* Google Shopping results
+* Keyword volume estimates
+* Competitor analysis
+* Price comparison
 
-### Método
+**DataForSEO:** https://dataforseo.com/
+* Google Shopping API
+* Google Trends API
+* Keyword research
+* SERP features
 
-* SerpAPI
-  OU
-* DataForSEO.
+### Implementação
 
----
+```python
+class SerpProvider:
+    def get_shopping_data(query):
+        # Product count
+        # Price ranges
+        # Merchant count
+        # Ad presence
+        # Shopping features
+```
 
-# FASE 1.5 — Estrutura Inteligente de Dados
+### Métricas
 
-## Objetivo
+* Volume de anúncios shopping
+* Número de merchants
+* Faixa de preço
+* Presença de ads
+* Features destacadas
 
-Transformar dados brutos em sinais úteis.
-
----
-
-# Sistema de Score
-
-## Exemplo
-
-### Tendência
-
-* Busca subindo → positivo
-* Busca caindo → negativo
-
-### Concorrência
-
-* Muitos vendedores → negativo
-* Poucos vendedores → positivo
-
-### Saturação
-
-* Guerra de preço → negativo
-
-### Faixa de preço
-
-* Margem saudável → positivo
+**Prazo:** 2-3 semanas
 
 ---
 
-# Fórmula Inicial
+## FASE 4 — Controlled Web Scraping (📋 PLANEJADO)
 
-## Score Final
+**Objetivo:** Coletar dados públicos de marketplaces sem depender de APIs.
 
-* Tendência → 35%
-* Concorrência → 30%
-* Saturação → 20%
-* Preço/Margem → 15%
+### Architecture
 
----
+```python
+class ScraperProvider:
+    def scrape_marketplace(query, marketplace='mercadolivre'):
+        # Rotating user agents
+        # Request throttling
+        # Retry logic
+        # HTML parsing
+        # Anti-detection measures
+        # Cache layer
+```
 
-# Classificação
+### Targets
 
-## 0–3
+* Mercado Livre (public listings)
+* Shopee
+* Amazon.com.br
+* Magazine Luiza
+* Casas Bahia
 
-Produto ruim
+### Safety
 
-## 4–6
+* Respect robots.txt
+* Rate limiting
+* Caching (avoid repeat requests)
+* User-agent rotation
+* Graceful error handling
 
-Arriscado
-
-## 7–8
-
-Boa oportunidade
-
-## 9–10
-
-Alta oportunidade
-
----
-
-# Resposta Inteligente (IA)
-
-A IA NÃO decide os dados.
-
-Ela interpreta.
-
-## Exemplo de saída
-
-> “Produto apresenta crescimento recente de interesse, baixa saturação e concorrência moderada. Pode valer um teste inicial com estoque reduzido.”
+**Prazo:** 3-4 semanas
 
 ---
 
-# FASE 2 — Painel e Histórico
+## FASE 5 — Multi-Marketplace Expansion (📋 FUTURO)
 
-## Objetivo
+**Objetivo:** Adicionar marketplaces adicionais conforme APIs ficam disponíveis.
 
-Melhorar retenção.
+### Potential Providers
 
----
+**Shopee Open Platform**
+* Product search
+* Pricing data
+* Seller metrics
 
-# Funcionalidades
+**Amazon Product Advertising API**
+* Best sellers
+* Price history
+* Reviews
 
-## Histórico de pesquisas
+**AliExpress Affiliate API**
+* Trending products
+* Price data
+* International signals
 
-Usuário pode:
+**TikTok Shop API** (quando disponível)
+* Viral products
+* Social commerce signals
 
-* salvar análises;
-* comparar produtos;
-* revisar tendências.
-
----
-
-## Dashboard
-
-Mostrar:
-
-* produtos em alta;
-* nichos aquecendo;
-* oportunidades recentes.
-
----
-
-## Alertas
-
-Exemplo:
-
-> “Produto X aumentou 42% nas buscas nos últimos 7 dias.”
+**Mercado Livre** (quando policies permitirem)
+* Re-enable authenticated requests
+* Use approved endpoints only
 
 ---
 
-# FASE 3 — Expansão de Fontes
+## FASE 6 — Internal Intelligence Layer (📋 FUTURO)
 
-## Amazon Product Advertising API
+**Objetivo:** Criar vantagem competitiva com dados proprietários.
 
-### Objetivo
+### Features
 
-Adicionar:
+**Historical Tracking**
+```python
+class TrendTracker:
+    def track_product_over_time(product_id):
+        # Daily snapshots
+        # Price evolution
+        # Demand changes
+        # Competition growth
+```
 
-* preços;
-* avaliações;
-* concorrência;
-* oferta.
+**User Behavior Analytics**
+```python
+class UserIntelligence:
+    def analyze_search_patterns():
+        # Most searched products
+        # Trending categories
+        # User CTR
+        # Conversion signals
+```
 
-### Observação
+**Predictive Scoring**
+```python
+class PredictiveEngine:
+    def predict_trend_momentum(product, historical_data):
+        # ML-based prediction
+        # Trend acceleration
+        # Saturation detection
+        # Opportunity timing
+```
 
-Amazon possui requisitos chatos para manter acesso.
+### Data Sources
 
-Não priorizar agora.
+* Historical search database
+* User interaction data
+* CTR analytics
+* Saved searches
+* Repeat queries
+* Product lifecycle tracking
 
----
-
-## Shopee Open Platform
-
-### Objetivo
-
-Expandir sinais de marketplace.
-
-### Problema
-
-API menos amigável para pesquisa pública ampla.
-
-Entrar apenas depois.
-
----
-
-## TikTok Trends / Social Signals
-
-### Objetivo
-
-Detectar:
-
-* produtos viralizando;
-* sinais sociais;
-* crescimento antecipado.
-
----
-
-# FASE 4 — Base Própria de Inteligência
-
-## Objetivo
-
-Criar vantagem competitiva real.
+**Prazo:** 3+ meses
 
 ---
 
-# Sistema começa a aprender com:
+# Stack Técnico — Atual
 
-* buscas dos usuários;
-* produtos mais pesquisados;
-* análises salvas;
-* tendências internas;
-* comportamento agregado.
+## Backend
 
----
+* Django 4.2
+* Django REST Framework (futuro)
+* PostgreSQL
+* Python 3.11+
 
-# FASE 5 — IA Mais Forte
+## Frontend
 
-## Possíveis recursos futuros
+* Django Templates (atual)
+* Bootstrap 5
+* React (futuro)
 
-### IA conversacional
+## Infrastructure
 
-Usuário pergunta:
+* Render (deployment)
+* GitHub (version control)
+* PostgreSQL (Render managed)
 
-> “Vale vender isso em 2026?”
+## APIs & Services
 
----
+* Mercado Livre OAuth (implemented, blocked by policy)
+* pytrends (planned)
+* SerpAPI (planned)
+* DataForSEO (planned)
 
-### Recomendações automáticas
+## Security
 
-> “Produtos similares com menor concorrência.”
-
----
-
-### Comparador de nichos
-
-Ex:
-
-* Pet
-  vs
-* Cozinha
-  vs
-* Gamer
+* OAuth 2.0 + PKCE
+* Token encryption
+* Environment variables
+* CSRF protection
+* SSL/HTTPS
 
 ---
 
-# Modelo de Monetização
+# Provider Status Matrix
+
+| Provider | Status | Type | Cost | Priority |
+|----------|--------|------|------|----------|
+| MockProvider | ✅ Active | Fallback | Free | Core |
+| MercadoLivreProvider | ⚠️ Blocked | OAuth API | Free | Medium |
+| GoogleTrendsProvider | 📋 Planned | pytrends | Free | High |
+| SerpProvider | 📋 Planned | SerpAPI | Paid | Medium |
+| DataForSEOProvider | 📋 Planned | API | Paid | Medium |
+| ScraperProvider | 📋 Planned | Scraping | Free | High |
+| ShopeeProvider | 📋 Future | API | Free | Low |
+| AmazonProvider | 📋 Future | API | Free | Low |
+
+---
+
+# Development Rules
+
+## Critical Rules
+
+1. ✅ **Never block MVP on external provider approval**
+2. ✅ **Always have fallback data**
+3. ✅ **Never generate 500 errors from provider failures**
+4. ✅ **All providers must support graceful degradation**
+5. ✅ **System must always return valid analysis**
+
+## Provider Implementation Rules
+
+```python
+# ✅ CORRECT
+try:
+    data = provider.fetch_data(query)
+    if data:
+        return normalize_data(data)
+except Exception as e:
+    log_error(e)
+    # Continue to next provider
+
+# ❌ INCORRECT
+data = provider.fetch_data(query)  # Can crash entire request
+return normalize_data(data)  # No fallback
+```
+
+## Scoring Rules
+
+* Minimum 2 providers for production analysis
+* Mock data clearly labeled
+* Confidence level based on provider count
+* Transparent source attribution
+
+---
+
+# Modelo de Monetização — Atualizado
 
 ## Gratuito
 
-* pesquisas limitadas;
-* score básico.
+* 5 análises/dia
+* Score básico
+* 1 fonte de dados
+* Sem histórico
+
+## Pro ($19.90/mês)
+
+* Análises ilimitadas
+* Score avançado
+* Múltiplas fontes agregadas
+* Histórico completo
+* Alertas de tendência
+* Dados históricos
+
+## Business ($49.90/mês)
+
+* Tudo do Pro
+* API access
+* White-label reports
+* Priority support
+* Custom providers
 
 ---
 
-## Pro
+# Timeline Realista — Atualizado
 
-* análises ilimitadas;
-* histórico;
-* alertas;
-* tendências avançadas.
+## ✅ Semanas 1-4 (Concluído)
 
----
+* Django structure
+* Landing page
+* Market app
+* OAuth integration
+* Token persistence
+* Scoring system
+* Mock provider
+* Deployment
 
-# Ordem REALISTA de Desenvolvimento
+## 🔄 Semana 5 (Atual)
 
-## Semana 1
+* UI/UX improvements
+* Error handling polish
+* Provider status indicators
+* Documentation updates
 
-* Estrutura Django
-* Banco
-* Usuários
-* Tela pesquisa
+## 📋 Semanas 6-7
 
----
+* Google Trends integration
+* Trend scoring
+* Historical curves
+* Related queries
 
-## Semana 2
+## 📋 Semanas 8-10
 
-* Integração Mercado Livre
-* Google Trends
-* Sistema de score
+* SERP provider integration
+* Shopping signals
+* Keyword volume
+* Multi-source aggregation
 
----
+## 📋 Semanas 11-14
 
-## Semana 3
+* Scraping architecture
+* First marketplace scrapers
+* Cache layer
+* Parser abstraction
 
-* Resultado visual
-* Dashboard básico
-* Histórico
+## 📋 Semanas 15+
 
----
-
-## Semana 4
-
-* Melhorias
-* Deploy
-* Testes reais
-* Feedback dos usuários
+* Additional providers
+* Internal intelligence
+* Dashboard v2
+* User analytics
 
 ---
 
@@ -456,10 +627,47 @@ Ex:
 
 O objetivo NÃO é:
 
-> “criar IA revolucionária.”
+> "ter acesso a todas as APIs possíveis."
 
 O objetivo é:
 
-> “entregar decisões melhores usando sinais reais de mercado.”
+> **"Agregar múltiplos sinais de mercado para entregar decisões melhores do que qualquer fonte isolada."**
 
-Isso é muito mais viável.
+## Vantagem Competitiva
+
+Competitors dependem de:
+* Uma única API
+* Dados limitados
+* Perspectiva única
+
+**Radar de Tendências oferece:**
+* Múltiplas fontes
+* Agregação inteligente
+* Scoring proprietário
+* Resiliência a bloqueios
+* Inteligência exclusiva
+
+---
+
+# Conclusão
+
+A limitação do Mercado Livre API **NÃO é um problema.**
+
+É uma **oportunidade de construir arquitetura superior.**
+
+Plataformas que dependem de um único provider são vulneráveis.
+
+Plataformas que agregam múltiplas fontes são **valiosas e defensáveis.**
+
+---
+
+# Próximos Passos Imediatos
+
+1. ✅ Documentar arquitetura multi-provider
+2. ✅ Documentar bloqueio Mercado Livre
+3. 🔄 Polish current MVP UI
+4. 📋 Implementar Google Trends
+5. 📋 Implementar SERP signals
+6. 📋 Build scraping layer
+
+**Foco:** MVP robusto e multi-fonte em 8-12 semanas.

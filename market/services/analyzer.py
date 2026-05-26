@@ -1,8 +1,27 @@
 """
-Main product analyzer service.
+Main product analyzer service - Multi-Provider Intelligence Engine.
 
-Orchestrates data collection, scoring, and analysis generation.
-Handles both 'basic' (free) and 'premium' (paid) analysis modes.
+Orchestrates data collection from multiple providers, aggregates signals,
+calculates weighted scores, and generates market intelligence analysis.
+
+Architecture:
+- Provider-agnostic: Works with any data source (API, scraping, trends, etc.)
+- Resilient: Graceful fallback if providers unavailable
+- Extensible: Easy to add new data providers
+- Never fails: Always returns valid analysis
+
+Providers:
+- Mercado Livre API (OAuth, currently policy-blocked)
+- Google Trends (planned: Phase 2)
+- SERP APIs (planned: Phase 3)
+- Web scraping (planned: Phase 4)
+- Mock fallback (always available)
+
+Modes:
+- 'basic' (free): Core scores and classification
+- 'premium' (paid): Full data, historical trends, alerts
+
+See: docs/provider_architecture.md for complete architecture documentation.
 """
 from . import mercado_livre, google_trends, scoring
 
