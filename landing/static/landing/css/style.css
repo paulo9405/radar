@@ -246,6 +246,116 @@ section {
     color: var(--success);
 }
 
+/* Hero Inline Form - Immediate Action */
+.hero-form-inline {
+    margin-top: 2.5rem;
+    margin-bottom: 2rem;
+    max-width: 500px;
+}
+
+.form-group-inline {
+    margin-bottom: 1rem;
+}
+
+.form-label-inline {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hero-form-inline input[type="text"],
+.hero-form-inline input[type="tel"] {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    font-size: 1.125rem;
+    background: var(--bg-card);
+    border: 2px solid rgba(0, 212, 255, 0.2);
+    border-radius: 12px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.hero-form-inline input[type="text"]:focus,
+.hero-form-inline input[type="tel"]:focus {
+    outline: none;
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.1), var(--glow-cyan);
+}
+
+.hero-form-inline input[type="text"]::placeholder,
+.hero-form-inline input[type="tel"]::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-hero-action {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+    border: none;
+    padding: 1.125rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    border-radius: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    letter-spacing: -0.01em;
+}
+
+.btn-hero-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+}
+
+.btn-hero-action:active {
+    transform: translateY(0);
+}
+
+.form-helper-inline {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.form-helper-inline i {
+    font-size: 0.875rem;
+    color: var(--accent-cyan);
+}
+
+.hero-trust-signals-minimal {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.trust-item-minimal {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.trust-item-minimal i {
+    font-size: 1rem;
+    color: var(--accent-cyan);
+}
+
 /* Legacy hero styles for backwards compatibility */
 .hero-title {
     font-size: 3.5rem;
@@ -317,6 +427,28 @@ section {
     .hero-trust-signals {
         flex-direction: column;
         gap: 1rem;
+    }
+
+    .hero-form-inline {
+        margin-top: 2rem;
+        max-width: 100%;
+    }
+
+    .btn-hero-action {
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+    }
+
+    .hero-form-inline input[type="text"],
+    .hero-form-inline input[type="tel"] {
+        font-size: 1rem;
+        padding: 0.875rem 1rem;
+    }
+
+    .hero-trust-signals-minimal {
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
     }
 
     .hero-title {

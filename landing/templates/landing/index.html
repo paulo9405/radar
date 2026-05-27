@@ -45,14 +45,52 @@
                 <div class="col-lg-6 hero-content">
                     <h1 class="hero-title-conversion">Pare de comprar produtos saturados</h1>
 
-                    <p class="hero-subtitle-conversion">Veja se o produto ainda vende antes de comprar estoque. Análise grátis em segundos.</p>
+                    <p class="hero-subtitle-conversion">Descubra se o produto ainda vende antes de investir em estoque. <span style="color: #00d4ff; font-weight: 600;">🎁 Ganhe 1 análise grátis.</span></p>
 
-                    <div class="hero-trust-signals">
-                        <div class="trust-item">
+                    <!-- Messages -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- FORM MOVED UP - Immediate Action -->
+                    <div class="hero-form-inline">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+
+                            <div class="form-group-inline">
+                                <label for="{{ form.whatsapp.id_for_label }}" class="form-label-inline">Seu WhatsApp</label>
+                                {{ form.whatsapp }}
+                                {% if form.whatsapp.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.whatsapp.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <button type="submit" class="btn-hero-action">
+                                <span>Liberar análise grátis</span>
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+
+                            <small class="form-helper-inline">
+                                <i class="bi bi-info-circle"></i>
+                                1 análise grátis por número
+                            </small>
+                        </form>
+                    </div>
+
+                    <div class="hero-trust-signals-minimal">
+                        <div class="trust-item-minimal">
                             <i class="bi bi-graph-up-arrow"></i>
-                            <span>Baseado em dados do Google Trends</span>
+                            <span>Google Trends</span>
                         </div>
-                        <div class="trust-item">
+                        <div class="trust-item-minimal">
                             <i class="bi bi-lightning-charge-fill"></i>
                             <span>Resultado instantâneo</span>
                         </div>
@@ -116,71 +154,6 @@
                                     <p class="score-title">Chance de vender</p>
                                     <p class="score-subtitle">Boa oportunidade detectada</p>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Form Section - MOVED UP for maximum conversion -->
-    <section id="form" class="form-section-conversion">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-5">
-                    <div class="form-header-conversion text-center">
-                        <div class="form-badge-conversion">
-                            <i class="bi bi-gift-fill"></i>
-                            Análise Grátis
-                        </div>
-                        <h2 class="form-title-conversion">Coloque seu WhatsApp e ganhe uma análise gratuita</h2>
-                        <p class="form-subtitle-conversion">
-                            Digite o número e receba sua análise na hora
-                        </p>
-                    </div>
-
-                    <!-- Messages -->
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-
-                    <!-- Form Card -->
-                    <div class="form-card-conversion">
-                        <form method="post" novalidate>
-                            {% csrf_token %}
-
-                            <div class="mb-4">
-                                <label for="{{ form.whatsapp.id_for_label }}" class="form-label">Seu WhatsApp</label>
-                                {{ form.whatsapp }}
-                                <small class="form-text">Cada número pode fazer 1 teste gratuito</small>
-                                {% if form.whatsapp.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.whatsapp.errors }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <button type="submit" class="btn btn-primary btn-lg w-100 submit-button-conversion">
-                                <span class="button-text">Liberar minha análise grátis</span>
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </button>
-                        </form>
-
-                        <div class="form-footer-trust">
-                            <div class="trust-badge">
-                                <i class="bi bi-shield-check-fill"></i>
-                                <span>100% gratuito</span>
-                            </div>
-                            <div class="trust-badge">
-                                <i class="bi bi-lightning-fill"></i>
-                                <span>Resultado instantâneo</span>
                             </div>
                         </div>
                     </div>
