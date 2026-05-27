@@ -259,12 +259,12 @@ section {
 
 .form-label-inline {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    color: var(--text-primary);
+    margin-bottom: 0.625rem;
+    letter-spacing: -0.01em;
+    line-height: 1.4;
 }
 
 .hero-form-inline input[type="text"],
@@ -296,29 +296,75 @@ section {
     width: 100%;
     background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
     border: none;
-    padding: 1.125rem 2rem;
-    font-size: 1.125rem;
-    font-weight: 700;
-    border-radius: 12px;
+    padding: 1.375rem 2.5rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+    border-radius: 14px;
     color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 12px 35px rgba(0, 212, 255, 0.35),
+        0 4px 15px rgba(0, 102, 255, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    letter-spacing: -0.01em;
+    gap: 0.625rem;
+    margin-top: 1.25rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-hero-action::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-hero-action:hover::before {
+    left: 100%;
 }
 
 .btn-hero-action:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.4);
+    transform: translateY(-3px) scale(1.01);
+    box-shadow:
+        0 16px 45px rgba(0, 212, 255, 0.45),
+        0 6px 20px rgba(0, 102, 255, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        var(--glow-cyan-strong);
 }
 
 .btn-hero-action:active {
-    transform: translateY(0);
+    transform: translateY(-1px) scale(0.99);
+    box-shadow:
+        0 8px 25px rgba(0, 212, 255, 0.3),
+        0 3px 12px rgba(0, 102, 255, 0.2),
+        inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-hero-text {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+.btn-hero-action i {
+    font-size: 1.375rem;
+    font-weight: bold;
+    transition: transform 0.25s ease;
+}
+
+.btn-hero-action:hover i {
+    transform: translateX(4px);
 }
 
 .form-helper-inline {
@@ -435,8 +481,20 @@ section {
     }
 
     .btn-hero-action {
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
+        padding: 1.25rem 2rem;
+        font-size: 1.125rem;
+    }
+
+    .btn-hero-text {
+        font-size: 1.125rem;
+    }
+
+    .btn-hero-action i {
+        font-size: 1.25rem;
+    }
+
+    .form-label-inline {
+        font-size: 0.875rem;
     }
 
     .hero-form-inline input[type="text"],
