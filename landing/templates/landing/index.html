@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Veja se o produto ainda vende antes de comprar estoque. Evite perder dinheiro com produtos saturados.">
-    <meta name="keywords" content="produtos para vender, o que vender, shopee, mercado livre, produtos saturados, dropshipping">
-    <title>Descubra se um produto ainda vale a pena vender | Radar de Tendências</title>
+    <meta name="description" content="Descubra produtos antes de ficarem saturados. IA identifica oportunidades antes do mercado ficar cheio.">
+    <meta name="keywords" content="produtos para vender, o que vender, tendências, oportunidades, shopee, mercado livre, produtos saturados, dropshipping">
+    <title>Descubra produtos antes de ficarem saturados | Radar de Tendências</title>
 
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -41,166 +41,250 @@
     <!-- Hero Section -->
     <section id="hero" class="hero-section">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6 hero-content">
-                    <h1 class="hero-title-conversion">Descubra se o produto ainda vende</h1>
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="hero-content-centered">
+                        <!-- Subtle Social Proof -->
+                        <div class="social-proof-subtle">
+                            +247 análises realizadas esta semana
+                        </div>
 
-                    <p class="hero-subtitle-conversion">Veja se vale a pena antes de comprar estoque. <span style="color: #00d4ff; font-weight: 600;">🎁 Ganhe 1 análise grátis.</span></p>
+                        <h1 class="hero-title-conversion">Descubra se um produto ainda vale a pena vender</h1>
 
-                    <!-- Messages -->
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
-                                <i class="bi bi-check-circle-fill me-2"></i>
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
+                        <p class="hero-subtitle-conversion">Analise tendência, concorrência e saturação antes de investir.</p>
 
-                    <!-- FORM MOVED UP - Immediate Action -->
-                    <div class="hero-form-inline">
-                        <form method="post" novalidate>
-                            {% csrf_token %}
-
+                        <!-- Product Input Form -->
+                        <div class="hero-form-inline" id="product-input-form">
                             <div class="form-group-inline">
-                                <label for="{{ form.whatsapp.id_for_label }}" class="form-label-inline">Digite seu WhatsApp para fazer o teste grátis</label>
-                                {{ form.whatsapp }}
-                                {% if form.whatsapp.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        {{ form.whatsapp.errors }}
-                                    </div>
-                                {% endif %}
+                                <label for="product-input" class="form-label-inline">Qual produto você quer analisar?</label>
+                                <input
+                                    type="text"
+                                    id="product-input"
+                                    class="form-control form-control-lg"
+                                    placeholder="Ex: Mini Impressora Térmica"
+                                    autocomplete="off">
                             </div>
 
-                            <button type="submit" class="btn-hero-action">
-                                <span class="btn-hero-text">FAZER TESTE GRÁTIS</span>
+                            <button type="button" id="analyze-button" class="btn-hero-action">
+                                <span class="btn-hero-text">ANALISAR PRODUTO</span>
                                 <i class="bi bi-arrow-right"></i>
                             </button>
 
                             <small class="form-helper-inline">
-                                <i class="bi bi-info-circle"></i>
-                                1 análise grátis por número
+                                <i class="bi bi-shield-check"></i>
+                                Dados de Google Trends e marketplaces brasileiros
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-card">
+            <div class="loading-spinner"></div>
+            <p class="loading-text" id="loading-text">Analisando tendências...</p>
+        </div>
+    </div>
+
+    <!-- Analysis Results Section (Initially Hidden) -->
+    <section id="analysis-results" class="analysis-results-section" style="display: none;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+
+                    <!-- Partial Analysis Preview -->
+                    <div id="partial-analysis" class="partial-analysis-card">
+                        <div class="analysis-header-section">
+                            <h2 class="analysis-product-name" id="analysis-product-name">Mini Impressora Térmica</h2>
+                            <div class="analysis-status-badge" id="analysis-status-badge">
+                                <span id="status-text">Crescimento detectado</span>
+                            </div>
+                        </div>
+
+                        <div class="analysis-signals-grid">
+                            <div class="signal-item">
+                                <span class="signal-icon" id="trend-signal">📈</span>
+                                <span class="signal-text" id="trend-text">Volume de buscas cresceu nas últimas semanas</span>
+                            </div>
+                            <div class="signal-item">
+                                <span class="signal-icon" id="competition-signal">👥</span>
+                                <span class="signal-text" id="competition-text">~120 vendedores ativos detectados</span>
+                            </div>
+                            <div class="signal-item">
+                                <span class="signal-icon" id="saturation-signal">📊</span>
+                                <span class="signal-text" id="saturation-text">Saturação estimada em 35% (espaço disponível)</span>
+                            </div>
+                            <div class="signal-item">
+                                <span class="signal-icon" id="opportunity-signal">⏱️</span>
+                                <span class="signal-text" id="opportunity-text">Janela estimada: próximos 45-60 dias</span>
+                            </div>
+                        </div>
+
+                        <div class="analysis-insight">
+                            <p id="partial-insight">Crescimento consistente detectado. Concorrência gerenciável. Mercado permite entrada com diferenciação.</p>
+                        </div>
+
+                        <div class="analysis-blur-fade"></div>
+                    </div>
+
+                    <!-- Micro Testimonial -->
+                    <div id="micro-testimonial" class="micro-testimonial-card" style="display: none;">
+                        <div class="testimonial-content">
+                            <p class="testimonial-text">"Me ajudou a evitar um produto já saturado."</p>
+                            <p class="testimonial-author">— Pedro S., vendedor Mercado Livre</p>
+                        </div>
+                    </div>
+
+                    <!-- Lock Screen -->
+                    <div id="lock-screen" class="lock-screen-card">
+                        <div class="lock-icon-wrapper">
+                            <i class="bi bi-unlock"></i>
+                        </div>
+
+                        <h3 class="lock-title">Veja a análise completa</h3>
+                        <p class="lock-subtitle">Desbloqueie os detalhes completos da análise</p>
+
+                        <ul class="lock-benefits">
+                            <li><i class="bi bi-check-circle-fill"></i> Tendência completa com dados históricos</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Análise detalhada da concorrência</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Recomendação personalizada da IA</li>
+                            <li><i class="bi bi-check-circle-fill"></i> Sinais do mercado em tempo real</li>
+                        </ul>
+
+                        <form id="unlock-form" class="unlock-form">
+                            <div class="form-group-unlock">
+                                <label for="contact-input" class="unlock-form-label">Digite seu WhatsApp ou email</label>
+                                <input
+                                    type="text"
+                                    id="contact-input"
+                                    class="form-control form-control-lg"
+                                    placeholder="(38) 99999-9999"
+                                    autocomplete="off">
+                                <div class="invalid-feedback" id="contact-error"></div>
+                            </div>
+
+                            <button type="submit" class="btn-unlock-primary">
+                                VER ANÁLISE COMPLETA
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+
+                            <small class="unlock-helper">
+                                <i class="bi bi-shield-check"></i>
+                                Seus dados são protegidos
                             </small>
                         </form>
                     </div>
 
-                    <div class="hero-trust-signals-minimal">
-                        <div class="trust-item-minimal">
-                            <i class="bi bi-graph-up-arrow"></i>
-                            <span>Google Trends</span>
-                        </div>
-                        <div class="trust-item-minimal">
-                            <i class="bi bi-lightning-charge-fill"></i>
-                            <span>Resultado instantâneo</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="mockup-card">
-                        <div class="mockup-header">
-                            <span class="mockup-label">
-                                <span class="scanning-indicator"></span>
-                                Exemplo de Análise
-                            </span>
-                            <span class="mockup-badge">
+                    <!-- Full Analysis (Initially Hidden) -->
+                    <div id="full-analysis" class="full-analysis-card" style="display: none;">
+                        <div class="full-analysis-header">
+                            <div class="analysis-complete-badge">
                                 <i class="bi bi-check-circle-fill"></i>
-                                Dados reais do Google Trends
-                            </span>
+                                Análise completa
+                            </div>
+                            <h2 class="full-analysis-title" id="full-product-name">Mini Impressora Térmica</h2>
                         </div>
-                        <div class="mockup-body">
-                            <h3 class="product-name">Luminária LED Sunset Projetor</h3>
 
-                            <!-- Compact Analysis Result -->
-                            <div class="ai-analysis">
-                                <p class="analysis-text">Procura cresceu 47% nos últimos 30 dias. Poucos vendedores ainda. Vale a pena testar agora.</p>
+                        <div class="full-analysis-status">
+                            <div class="status-score">
+                                <span class="status-label" id="full-status-label">CRESCIMENTO DETECTADO</span>
+                            </div>
+                            <p class="status-insight" id="full-insight">Produto apresenta crescimento consistente com concorrência gerenciável. Momento adequado para entrada no mercado com diferenciação.</p>
+                        </div>
+
+                        <div class="analysis-metrics-detailed">
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-header">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                    <h4>Tendência</h4>
+                                </div>
+                                <p class="metric-detail-value" id="trend-detail">+45% nas buscas (últimas 4 semanas)</p>
+                                <p class="metric-detail-desc">Crescimento sustentado detectado.</p>
                             </div>
 
-                            <div class="metrics-grid">
-                                <div class="metric-item">
-                                    <span class="metric-label">Demanda</span>
-                                    <span class="metric-value high">
-                                        <span class="trend-arrow">↗</span>
-                                        Crescendo
-                                    </span>
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-header">
+                                    <i class="bi bi-people"></i>
+                                    <h4>Concorrência</h4>
                                 </div>
-                                <div class="metric-item">
-                                    <span class="metric-label">Saturação</span>
-                                    <span class="metric-value low">
-                                        <span class="check-icon">✓</span>
-                                        Baixa
-                                    </span>
-                                </div>
+                                <p class="metric-detail-value" id="competition-detail">~120 vendedores ativos no ML</p>
+                                <p class="metric-detail-desc">Mercado ainda permite entrada.</p>
                             </div>
 
-                            <div class="score-section">
-                                <div class="score-circle">
-                                    <svg class="score-ring" width="90" height="90">
-                                        <defs>
-                                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
-                                                <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
-                                            </linearGradient>
-                                        </defs>
-                                        <circle class="score-ring-bg" cx="45" cy="45" r="38"></circle>
-                                        <circle class="score-ring-progress" cx="45" cy="45" r="38"></circle>
-                                    </svg>
-                                    <div class="score-content">
-                                        <span class="score-number">8.4</span>
-                                        <span class="score-max">/10</span>
-                                    </div>
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-header">
+                                    <i class="bi bi-activity"></i>
+                                    <h4>Saturação</h4>
                                 </div>
-                                <div class="score-info">
-                                    <p class="score-title">Chance de vender</p>
-                                    <p class="score-subtitle">Boa oportunidade detectada</p>
+                                <p class="metric-detail-value" id="saturation-detail">Estimada em 35% (espaço disponível)</p>
+                                <p class="metric-detail-desc">Janela: próximos 45-60 dias.</p>
+                            </div>
+
+                            <div class="metric-detail-card">
+                                <div class="metric-detail-header">
+                                    <i class="bi bi-lightning"></i>
+                                    <h4>Recomendação</h4>
                                 </div>
+                                <p class="metric-detail-value metric-recommendation" id="recommendation-detail">Validar fornecedor antes de escalar</p>
+                                <p class="metric-detail-desc" id="recommendation-reason">Teste lote pequeno (50-100 un). Janela: 45-60 dias.</p>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Purchase Intent - Step 1 (Initially Hidden) -->
+                    <div id="purchase-intent-section" class="feedback-section-card" style="display: none;">
+                        <h3 class="feedback-title">Você pagaria para usar isso regularmente?</h3>
+
+                        <div class="feedback-options">
+                            <button class="intent-btn" data-value="yes">
+                                <span class="feedback-emoji">💰</span>
+                                <span class="feedback-label">Sim, pagaria</span>
+                            </button>
+                            <button class="intent-btn" data-value="maybe">
+                                <span class="feedback-emoji">🤔</span>
+                                <span class="feedback-label">Talvez, depende do preço</span>
+                            </button>
+                            <button class="intent-btn" data-value="no">
+                                <span class="feedback-emoji">❌</span>
+                                <span class="feedback-label">Não pagaria</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Launch Interest - Step 2 (Initially Hidden) -->
+                    <div id="launch-interest-section" class="feedback-section-card" style="display: none;">
+                        <h3 class="feedback-title">Quer saber quando lançarmos a versão completa?</h3>
+
+                        <div class="feedback-options">
+                            <button class="launch-btn" data-value="yes">
+                                <span class="feedback-emoji">🔥</span>
+                                <span class="feedback-label">Sim, quero!</span>
+                            </button>
+                            <button class="launch-btn" data-value="no">
+                                <span class="feedback-emoji">👍</span>
+                                <span class="feedback-label">Não, obrigado</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Final Thank You (Initially Hidden) -->
+                    <div id="thank-you-section" class="thank-you-card" style="display: none;">
+                        <div class="thank-you-icon">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </div>
+                        <h3 class="thank-you-title">Obrigado!</h3>
+                        <p class="thank-you-text">Você está na nossa lista de early access. Vamos avisar quando lançarmos.</p>
+                    </div>
+
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pain Section - Emotional & Direct -->
-    <section id="pain" class="pain-section-conversion">
-        <div class="container">
-            <div class="text-center pain-header">
-                <h2 class="section-title-conversion">Você já perdeu dinheiro assim?</h2>
-            </div>
-            <div class="row g-4 justify-content-center">
-                <div class="col-lg-4 col-md-6">
-                    <div class="pain-card-conversion">
-                        <div class="pain-icon-wrapper">
-                            <i class="bi bi-cash-coin"></i>
-                        </div>
-                        <h3 class="pain-title-conversion">Comprou e não vendeu</h3>
-                        <p class="pain-desc">Dinheiro parado em produto que ninguém quer.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="pain-card-conversion">
-                        <div class="pain-icon-wrapper">
-                            <i class="bi bi-graph-down-arrow"></i>
-                        </div>
-                        <h3 class="pain-title-conversion">Produto já saturado</h3>
-                        <p class="pain-desc">Mercado cheio antes de você começar.</p>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="pain-card-conversion">
-                        <div class="pain-icon-wrapper">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                        </div>
-                        <h3 class="pain-title-conversion">Decidiu no achismo</h3>
-                        <p class="pain-desc">Sem dados, só esperança.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section - Minimal -->
+    <!-- FAQ Section -->
     <section id="faq" class="faq-section-conversion">
         <div class="container">
             <div class="row justify-content-center">
@@ -214,7 +298,7 @@
                             </h3>
                             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Sim. A análise combina dados reais do Google Trends (interesse de busca) com sinais de saturação dos principais marketplaces brasileiros. Não é garantia de sucesso, mas ajuda você a tomar decisões baseadas em dados reais em vez de achismo.
+                                    Sim. Combinamos dados reais do Google Trends com sinais de marketplaces brasileiros. Não garantimos sucesso, mas ajudamos você a tomar decisões baseadas em dados reais em vez de achismo.
                                 </div>
                             </div>
                         </div>
@@ -227,7 +311,7 @@
                             </h3>
                             <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    100% reais. Usamos a API oficial do Google Trends para medir o interesse de busca, e verificamos a concorrência em marketplaces como Mercado Livre e Shopee. Os dados são atualizados constantemente.
+                                    100% reais. Usamos a API oficial do Google Trends e verificamos concorrência em marketplaces como Mercado Livre e Shopee.
                                 </div>
                             </div>
                         </div>
@@ -235,65 +319,28 @@
                         <div class="accordion-item">
                             <h3 class="accordion-header">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Por que a análise é grátis?
+                                    O que eu vou receber?
                                 </button>
                             </h3>
                             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
                                 <div class="accordion-body">
-                                    Estamos validando o produto. Você pode fazer 1 análise grátis para testar. Se achar útil e quiser acesso ilimitado, terá a opção de entrar na lista de espera da versão completa.
+                                    Você recebe 1 análise de um produto da sua escolha, com sinais de tendência, concorrência, saturação e recomendação inicial.
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- How Analysis Works Section -->
-    <section id="how-it-works" class="how-works-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8 text-center">
-                    <h2 class="section-title-conversion">Como funciona a análise?</h2>
-                    <p class="how-works-intro">Radar de Tendências combina sinais de mercado para ajudar a identificar se um produto ainda tem demanda, concorrência demais, ou uma oportunidade real antes de você investir em estoque.</p>
-                </div>
-            </div>
-            <div class="row g-4 mt-2">
-                <div class="col-lg-3 col-md-6">
-                    <div class="how-works-card">
-                        <div class="how-works-icon">
-                            <i class="bi bi-graph-up"></i>
+                        <div class="accordion-item">
+                            <h3 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    Por que a análise é grátis?
+                                </button>
+                            </h3>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Estamos validando o produto. Você pode fazer 1 análise grátis para testar. Se achar útil, terá opção de acesso ilimitado no futuro.
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="how-works-card-title">Interesse de busca</h3>
-                        <p class="how-works-card-text">Observamos sinais de demanda crescente ou em queda.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="how-works-card">
-                        <div class="how-works-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <h3 class="how-works-card-title">Concorrência</h3>
-                        <p class="how-works-card-text">Verificamos se já tem vendedores demais oferecendo o mesmo tipo de produto.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="how-works-card">
-                        <div class="how-works-icon">
-                            <i class="bi bi-shop"></i>
-                        </div>
-                        <h3 class="how-works-card-title">Marketplaces</h3>
-                        <p class="how-works-card-text">Usamos sinais públicos de plataformas como Google Trends, Mercado Livre e Amazon.</p>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="how-works-card">
-                        <div class="how-works-icon">
-                            <i class="bi bi-lightbulb"></i>
-                        </div>
-                        <h3 class="how-works-card-title">Oportunidade</h3>
-                        <p class="how-works-card-text">Resumimos os sinais para mostrar se o produto ainda parece valer a pena testar.</p>
                     </div>
                 </div>
             </div>

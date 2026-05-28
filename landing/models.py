@@ -92,7 +92,8 @@ class WhatsAppLead(models.Model):
         validators=[whatsapp_regex],
         max_length=20,
         verbose_name='WhatsApp',
-        unique=True,
+        blank=True,
+        default='',
         error_messages={
             'unique': 'Esse WhatsApp já utilizou a análise gratuita.'
         }
@@ -102,6 +103,8 @@ class WhatsAppLead(models.Model):
         max_length=20,
         verbose_name='WhatsApp Normalizado',
         db_index=True,
+        blank=True,
+        default='',
         help_text='Somente dígitos para lookup'
     )
 
@@ -138,7 +141,48 @@ class WhatsAppLead(models.Model):
         verbose_name='Session Key'
     )
 
+    # Contact info (can be WhatsApp OR email)
+    email = models.EmailField(
+        blank=True,
+        null=True,
+        verbose_name='Email'
+    )
+
+    # Analysis tracking
+    analysis_count = models.IntegerField(
+        default=1,
+        verbose_name='Número de Análises'
+    )
+
     # Conversion tracking
+    unlocked_analysis = models.BooleanField(
+        default=False,
+        verbose_name='Desbloqueou Análise'
+    )
+
+    unlocked_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name='Desbloqueado em'
+    )
+
+    willingness_to_pay = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        choices=[
+            ('yes', 'Sim, pagaria'),
+            ('maybe', 'Talvez'),
+            ('no', 'Não pagaria')
+        ],
+        verbose_name='Pagaria pelo produto'
+    )
+
+    launch_interest = models.BooleanField(
+        default=False,
+        verbose_name='Quer saber do lançamento'
+    )
+
     submitted_feedback = models.BooleanField(
         default=False,
         verbose_name='Enviou Feedback'
@@ -194,6 +238,76 @@ class WhatsAppLead(models.Model):
         self.free_test_used_at = timezone.now()
         self.analyzed_product = product_query
         self.save()
+
+
+class IPAnalysisLimit(models.Model):
+    """
+    Tracks analysis count per IP for rate limiting.
+    Resets daily.
+    """
+    ip_address = models.GenericIPAddressField(
+        verbose_name='IP Address',
+        unique=True
+    )
+
+    analysis_count = models.IntegerField(
+        default=0,
+        verbose_name='Analysis Count'
+    )
+
+    last_analysis_date = models.DateField(
+        auto_now=True,
+        verbose_name='Last Analysis Date'
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Created At'
+    )
+
+    class Meta:
+        verbose_name = 'IP Analysis Limit'
+        verbose_name_plural = 'IP Analysis Limits'
+
+    def __str__(self):
+        return f"{self.ip_address} - {self.analysis_count} analyses"
+
+    @classmethod
+    def can_analyze(cls, ip_address):
+        """Check if IP can perform another analysis (max 2 per day)"""
+        from django.utils import timezone
+        today = timezone.now().date()
+
+        try:
+            limit = cls.objects.get(ip_address=ip_address)
+            # Reset if it's a new day
+            if limit.last_analysis_date < today:
+                limit.analysis_count = 0
+                limit.save()
+            return limit.analysis_count < 2
+        except cls.DoesNotExist:
+            return True
+
+    @classmethod
+    def increment_count(cls, ip_address):
+        """Increment analysis count for IP"""
+        from django.utils import timezone
+        today = timezone.now().date()
+
+        limit, created = cls.objects.get_or_create(
+            ip_address=ip_address,
+            defaults={'analysis_count': 1}
+        )
+
+        if not created:
+            # Reset if new day
+            if limit.last_analysis_date < today:
+                limit.analysis_count = 1
+            else:
+                limit.analysis_count += 1
+            limit.save()
+
+        return limit.analysis_count
 
 
 class AnalysisFeedback(models.Model):
